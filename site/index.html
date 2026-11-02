@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rofaida Abdelwahap · Portfolio</title>
+<meta name="description" content="Rofaida Abdelwahap, product and UI designer: case studies, app and web UI, and graphics.">
+<meta property="og:title" content="Rofaida Abdelwahap · Portfolio">
+<meta property="og:description" content="Product and UI designer: case studies, app and web UI, and graphics.">
+<meta property="og:image" content="f/avatar.webp">
+<link rel="icon" href="f/avatar.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Almarai:wght@400;700&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Archivo+Narrow:wght@400;500;600&family=Archivo:wght@400;500;600;800&family=Architects+Daughter&family=Homemade+Apple&family=Special+Elite&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Courier+Prime:wght@400;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="site" id="site" data-theme="day" data-mode="world" data-face="0">
+  <a class="skip" href="#spots">Skip to the scene</a>
+
+  <!-- ============================================================ header (Figma "new header", Oct 26) -->
+  <header class="nhdr" id="gnav">
+    <a class="nh-me" href="#home" data-go="home" aria-label="Rofaida Abdelwahap, back home"><img src="f/avatar.webp" alt="" width="40" height="40"><span class="nh-name" aria-hidden="true"><span class="tw">Rofaida Abdelwahap</span><i class="caret"></i></span></a>
+    <button class="nh-compass" id="compassBtn" type="button" aria-expanded="false" aria-controls="compass" aria-haspopup="dialog"><span class="sr">Open the menu. You are on: </span><svg class="cmp" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path class="cmp-n" d="M10.7754 10.7754L6.89453 13.1045L9.22363 9.22363L13.1045 6.89453L10.7754 10.7754Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path class="cmp-b" d="M11.6 6.4 8 10l3.6 3.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nh-cur" id="navCur">Home</span></button>
+  </header>
+
+  <!-- ============================================================ compass menu (opens from the header) -->
+  <div class="compass" id="compass" role="dialog" aria-modal="true" aria-labelledby="cpLbl" hidden>
+    <div class="cp-scrim" data-cp-close></div>
+    <div class="cp-wrap">
+      <div class="cp-side">
+        <figure class="cp-card cp-pic"><img src="f/cp-hill.webp" alt="Rofaida's painting of herself resting on the green hill, her cat and laptop beside her" width="700" height="548" decoding="async"></figure>
+        <div class="cp-card cp-note"><p>Thank you so much for stopping by!</p><img src="f/s-cream.webp" alt="" decoding="async"></div>
+      </div>
+      <div class="cp-main">
+        <div class="cp-card cp-menu">
+          <p class="cp-lbl" id="cpLbl">Compass</p>
+          <button class="cp-x" type="button" data-cp-close aria-label="Close the menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <nav class="cp-nav" aria-label="Primary">
+            <a href="#home" data-go="home">Home</a>
+            <a href="#works" data-go="works">Work</a>
+            <a href="#about" data-go="about">About me</a>
+            <a href="#play" data-go="play">Play</a>
+            <a href="https://drive.google.com/file/d/1btNfa-B7rLPgWYI5pzXkS12cbSmnBby5/view?usp=sharing" target="_blank" rel="noopener" id="resumeBtn">Resume <span class="sr">(opens in a new tab)</span></a>
+          </nav>
+          <div class="cp-rule"></div>
+          <ul class="cp-social">
+            <li><a href="https://www.linkedin.com/in/rofaida-abdelwahap-3187a1399" target="_blank" rel="noopener">LinkedIn</a></li>
+            <li><a href="https://www.behance.net/rofaidaabdelwap" target="_blank" rel="noopener">Behance</a></li>
+            <li><a href="mailto:rofaidaabdalwahap@gmail.com" data-copy="rofaidaabdalwahap@gmail.com">Email</a></li>
+          </ul>
+          <div class="cp-sound"><span>Meadow sound</span>
+    <button class="sound" id="soundBtn" aria-pressed="false" aria-label="Meadow sound">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect class="bar" x="3.75" y="8.25" width="1.5" height="7.5" rx=".75" fill="#2491CC"/>
+        <rect class="bar" x="7.5" y="2.25" width="1.5" height="19.5" rx=".75" fill="#2491CC"/>
+        <rect class="bar" x="11.25" y="5.25" width="1.5" height="13.5" rx=".75" fill="#2491CC"/>
+        <rect class="bar" x="15" y="8.25" width="1.5" height="7.5" rx=".75" fill="#2491CC"/>
+        <rect class="bar" x="18.75" y="6.75" width="1.5" height="10.5" rx=".75" fill="#2491CC"/>
+      </svg>
+    </button>
+          </div>
+        </div>
+        <a class="cp-cta" href="#contact" data-go="contact">Contact me <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================= the world: 3 rooms, 360° -->
+  <main class="world" id="world" aria-roledescription="carousel" aria-label="Three rooms you can turn between: home, selected works and about me">
+    <div class="w-backdrop" aria-hidden="true">
+      <div class="sky-drift"><div class="skytrack"><img src="f/sky-sketch.webp" alt=""><img class="flip" src="f/sky-sketch.webp" alt=""><img src="f/sky-sketch.webp" alt=""><img class="flip" src="f/sky-sketch.webp" alt=""></div></div>
+    </div>
+    <div class="scene" id="scene">
+      <div class="prism" id="prism">
+
+        <!-- ------------------------------------------------------- 0 · home -->
+        <section class="face f-home" id="home" data-i="0" aria-roledescription="slide" aria-label="Home">
+          <div class="art bg">
+            <div class="plate" id="plate">
+              <img class="full dayimg skyl" src="l/day-sky.webp" alt="" decoding="async">
+              <img class="full nightimg skyl" src="l/night-sky.webp" alt="" decoding="async">
+              <div class="stars skyl" aria-hidden="true">
+                <span class="star" style="left:8%;top:14%"></span><span class="star" style="left:22%;top:30%"></span>
+                <span class="star" style="left:41%;top:9%"></span><span class="star" style="left:55%;top:24%"></span>
+                <span class="star" style="left:66%;top:12%"></span><span class="star" style="left:79%;top:31%"></span>
+                <span class="star" style="left:88%;top:8%"></span><span class="star" style="left:94%;top:22%"></span>
+                <span class="star" style="left:33%;top:19%"></span><span class="star" style="left:72%;top:5%"></span>
+              </div>
+              <div class="cloudloop cloudl" aria-hidden="true">
+                <div class="cloudtrack far dayimg"><img src="l/day-clouds-far.webp" alt=""><img src="l/day-clouds-far.webp" alt=""></div>
+                <div class="cloudtrack far nightimg"><img src="l/night-clouds-far.webp" alt=""><img src="l/night-clouds-far.webp" alt=""></div>
+                <div class="cloudtrack dayimg"><img src="l/day-clouds-near.webp" alt=""><img src="l/day-clouds-near.webp" alt=""></div>
+                <div class="cloudtrack nightimg"><img src="l/night-clouds-near.webp" alt=""><img src="l/night-clouds-near.webp" alt=""></div>
+              </div>
+              <img class="full dayimg" src="l/day-land.webp" fetchpriority="high" decoding="async" alt="Painted scene: Rofaida lying on a grassy hillside above the sea with her eyes closed, a grey cat beside her, headphones, a laptop and an open notebook in the grass.">
+              <img class="full nightimg" src="l/night-land.webp" alt="" decoding="async">
+              <div class="catpart her-head" id="herHead" aria-hidden="true"><img class="dayimg" src="l/day-herhead.webp" alt=""><img class="nightimg" src="l/night-herhead.webp" alt=""></div>
+              <div class="spots" id="spots">
+                <a class="spot" href="#about" data-spot="notebook" data-go="about" aria-label="The notebook: open About me" style="left:72.455%;top:79.818%;width:10.818%;height:14.364%;--hit:polygon(0.0% 74.7%,8.7% 81.0%,11.2% 81.0%,18.2% 85.4%,22.4% 85.4%,24.4% 88.6%,34.5% 96.8%,39.5% 95.6%,44.8% 96.8%,47.9% 93.7%,48.5% 89.9%,49.3% 95.6%,50.7% 96.8%,56.0% 97.5%,57.4% 96.2%,58.3% 92.4%,58.8% 96.8%,60.8% 98.7%,76.5% 99.4%,87.1% 71.5%,87.4% 69.0%,89.9% 63.3%,91.3% 56.3%,98.0% 38.0%,99.7% 31.0%,99.7% 22.8%,98.6% 21.5%,96.9% 22.2%,95.5% 16.5%,93.0% 13.3%,85.2% 12.0%,82.4% 10.1%,77.6% 10.8%,75.1% 6.3%,70.9% 12.7%,68.3% 12.0%,61.3% 17.1%,57.1% 9.5%,49.9% 3.2%,42.0% 0.0%,32.2% 0.0%,18.5% 24.1%,16.5% 25.3%,15.7% 29.7%,4.2% 51.9%,3.9% 60.1%,0.0% 66.5%)"><img class="cut dayimg" src="l/day-cut-notebook.webp" alt=""><img class="cut nightimg" src="l/night-cut-notebook.webp" alt=""><span class="hit"></span><b>About me</b></a>
+                <a class="spot" href="#works" data-spot="laptop" data-go="works" aria-label="The laptop: open Selected works" style="left:80.909%;top:59.364%;width:9.152%;height:20.091%;--hit:polygon(99.7% 0.0%,95.0% 0.0%,56.3% 26.2%,55.0% 28.5%,51.3% 45.2%,47.0% 43.9%,43.4% 44.3%,5.6% 71.0%,0.0% 76.0%,0.0% 82.4%,7.9% 86.0%,13.2% 85.1%,39.4% 95.9%,40.1% 99.5%,49.7% 99.5%,52.6% 96.8%,54.6% 98.2%,58.9% 95.0%,60.6% 92.8%,61.9% 87.3%,68.9% 80.1%,70.9% 80.1%,78.8% 71.0%,82.5% 70.6%,87.1% 65.2%,89.4% 60.6%,91.1% 52.0%,92.1% 50.2%,99.7% 10.4%)"><img class="cut dayimg" src="l/day-cut-laptop.webp" alt=""><img class="cut nightimg" src="l/night-cut-laptop.webp" alt=""><span class="hit"></span><b>Selected works</b></a>
+                <a class="spot" href="#contact" data-spot="headphones" data-go="contact" aria-label="The headphones: open Contact" style="left:71.636%;top:54.455%;width:4.455%;height:9.273%;--hit:polygon(0.0% 33.3%,0.0% 61.8%,3.4% 71.6%,7.5% 77.5%,38.8% 99.0%,58.5% 99.0%,62.6% 97.1%,66.0% 92.2%,71.4% 76.5%,72.1% 67.6%,85.0% 74.5%,88.4% 71.6%,91.8% 63.7%,98.0% 61.8%,99.3% 58.8%,99.3% 27.5%,94.6% 13.7%,88.4% 5.9%,82.3% 2.9%,75.5% 3.9%,68.7% 0.0%,36.7% 0.0%,14.3% 12.7%,7.5% 19.6%)"><img class="cut dayimg" src="l/day-cut-headphones.webp" alt=""><img class="cut nightimg" src="l/night-cut-headphones.webp" alt=""><span class="hit"></span><b>Let&rsquo;s talk</b></a>
+                <a class="spot" href="#home" data-spot="cat" data-meow="grey" aria-label="The cat: say hi (meow)" style="left:58.788%;top:56.545%;width:5.818%;height:19.727%;--hit:polygon(61.5% 0.0%,58.3% 4.1%,55.7% 12.9%,56.2% 16.6%,58.9% 18.0%,57.3% 21.2%,57.3% 28.6%,58.3% 30.0%,57.3% 33.6%,53.1% 37.8%,42.7% 41.9%,41.1% 44.2%,33.9% 49.3%,28.1% 59.0%,27.6% 62.7%,25.5% 64.1%,24.0% 76.0%,19.3% 73.7%,16.7% 68.2%,17.7% 58.1%,20.3% 54.4%,20.3% 45.2%,18.8% 40.6%,10.9% 33.2%,3.6% 32.7%,0.0% 35.0%,0.0% 41.5%,6.2% 47.0%,5.2% 53.5%,1.6% 62.2%,1.6% 68.7%,4.2% 76.0%,12.0% 83.4%,16.7% 86.2%,22.4% 86.6%,25.0% 88.9%,29.7% 89.9%,32.8% 92.6%,36.5% 93.1%,43.2% 98.2%,47.4% 98.2%,49.0% 94.9%,51.6% 96.8%,54.2% 95.9%,56.8% 97.2%,60.4% 96.8%,64.1% 94.5%,65.6% 91.7%,69.3% 98.2%,71.4% 99.5%,85.9% 99.5%,88.5% 96.8%,89.6% 90.8%,86.5% 87.6%,87.0% 82.0%,92.2% 65.9%,97.4% 55.3%,97.4% 43.8%,95.3% 37.8%,96.4% 36.4%,95.8% 34.1%,99.5% 29.0%,99.5% 18.4%,97.9% 17.1%,99.0% 15.7%,97.9% 1.4%,96.9% 0.0%,91.7% 0.0%,83.3% 6.5%,74.5% 7.4%,65.1% 0.0%)"><img class="cut dayimg" src="l/day-cut-cat.webp" alt=""><img class="cut nightimg" src="l/night-cut-cat.webp" alt=""><span class="catpart cat-tail" id="catTail" style="left:0.896%;top:34.468%;width:31.934%;height:52.232%"><img class="dayimg" src="l/day-cat-tail.webp" alt=""><img class="nightimg" src="l/night-cat-tail.webp" alt=""></span><span class="catpart cat-hip" style="left:20.249%;top:64.436%;width:20.316%;height:27.399%"><img class="dayimg" src="l/day-cat-hip.webp" alt=""><img class="nightimg" src="l/night-cat-hip.webp" alt=""></span><span class="catpart cat-head" id="catHead" style="left:56.771%;top:-0.459%;width:54.168%;height:37.789%"><img class="dayimg" src="l/day-cat-head.webp" alt=""><img class="nightimg" src="l/night-cat-head.webp" alt=""></span><span class="hit"></span><b>Say hi</b></a>
+              </div>
+            </div>
+          </div>
+          <!-- the opening shot: close on her face; scrolling pulls the camera back to the hill -->
+          <div class="intro-backdrop" id="introBackdrop" aria-hidden="true"><img src="a/wide.webp" alt="" decoding="async"></div>
+          <div class="close-plate" id="closePlate" aria-hidden="true"><div class="inner">
+            <img class="full dayimg" src="a/closeup.webp" alt="" fetchpriority="high" decoding="async">
+            <img class="full nightimg" src="a/closeup-night.webp" alt="" decoding="async">
+            <img class="full ghost dayimg" src="a/closeup.webp" alt="" decoding="async">
+            <img class="full ghost nightimg" src="a/closeup-night.webp" alt="" decoding="async">
+          </div></div>
+          <div class="intro-vig" id="introVig" aria-hidden="true"></div>
+          <div class="intro-grain" aria-hidden="true"></div>
+          <canvas class="magic" id="magic" aria-hidden="true"></canvas>
+          <div class="ui home-ui">
+            <span class="pill" id="pill"><i></i><span class="pill-t">Hello, I&rsquo;m Rofaida Abdelwahap | Product &amp; visual designer</span></span>
+            <h1 class="mega home-title">Where stories<br>grow</h1>
+            <div class="vibes" id="vibes" role="group" aria-label="Music player: feel the vibes">
+              <span class="disk l" aria-hidden="true"><i></i></span>
+              <p class="v-title">FEEL THE VIBES</p>
+              <div class="v-bar"><span class="v-fill" id="vFill"></span><span class="v-knob" id="vKnob"></span>
+                <input type="range" id="vSeek" min="0" max="300" step="1" value="0" aria-label="Sound bath position" aria-valuetext="0:00 of 5:00"></div>
+              <span class="v-time a" id="vCur">0:00</span><span class="v-time b">5:00</span>
+              <button class="v-play" id="vPlay" type="button" aria-pressed="false" aria-label="Play the sound bath">
+                <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7.2v9.6a.6.6 0 0 0 .92.5l7.4-4.8a.6.6 0 0 0 0-1L9.92 6.7A.6.6 0 0 0 9 7.2Z" fill="currentColor"/></svg>
+                <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="6.5" width="3" height="11" rx="1" fill="currentColor"/><rect x="13.5" y="6.5" width="3" height="11" rx="1" fill="currentColor"/></svg>
+              </button>
+              <span class="disk r" aria-hidden="true"><i></i></span>
+              <audio id="vAudio" src="m/forest-sound-bath.mp3" preload="none" loop></audio>
+            </div>
+          </div>
+          <div class="ui intro-cue" id="introCue" aria-hidden="true"><span class="ic-word cue-d">Scroll</span><span class="ic-word cue-m">Swipe</span><svg class="ic-arrow" viewBox="0 0 14 14" fill="none"><path d="M7 1.5v11M2.5 8 7 12.5 11.5 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <p class="selhint" id="hint">Select an element to see <img src="i/arrow-r.svg" alt="" width="24" height="24"></p>
+          <div class="bubble" id="bubble" role="status" aria-live="polite"></div>
+        </section>
+
+        <!-- ---------------------------------------------- 1 · selected works -->
+        <section class="face f-works" id="works" data-i="1" aria-roledescription="slide" aria-label="Selected works">
+          <div class="zoomer" id="zoomer">
+          <div class="art bg"><img class="bgimg" src="a/works-bg.webp" alt="A laptop resting in a sunlit wildflower meadow above the sea" decoding="async" style="left:calc(-86.24 * var(--k));top:calc(-287.89 * var(--k));width:calc(2414.79 * var(--k));height:calc(1430.49 * var(--k))">
+            <div class="skyband" aria-hidden="true" style="left:calc(-86.24 * var(--k));top:calc(-287.89 * var(--k));width:calc(2414.79 * var(--k));height:calc(963.54 * var(--k))"><div class="sb-track"><img src="a/works-skyband.webp" alt=""><img class="flip" src="a/works-skyband.webp" alt=""><img src="a/works-skyband.webp" alt=""><img class="flip" src="a/works-skyband.webp" alt=""></div></div>
+          </div>
+          <h2 class="mega works-title">Selected<br>works</h2>
+          <div class="art wfg" aria-hidden="true"><img class="cutout" src="a/works-fg.webp" alt="" style="left:calc(-86.24 * var(--k));top:calc(425.13 * var(--k));width:calc(2414.79 * var(--k));height:calc(717.47 * var(--k))"></div>
+          <div class="art fx">
+            <svg class="screen" id="screen" viewBox="0 0 1921 1117" preserveAspectRatio="none" aria-hidden="true">
+              <defs><filter id="bloom" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="18"/></filter></defs>
+              <polygon class="s-bloom" points="1533.68,461.94 1032.18,468.86 990.63,763.63 1508.95,786.38" filter="url(#bloom)"/>
+              <polygon class="s-lit" points="1533.68,461.94 1032.18,468.86 990.63,763.63 1508.95,786.38"/>
+            </svg>
+            <button class="screen-hit" id="screenHit" type="button" aria-label="Open the laptop and see the projects" style="left:calc(990.63 * var(--k));top:calc(461.94 * var(--k));width:calc(543.05 * var(--k));height:calc(324.44 * var(--k))"><span class="s-label">Open the laptop</span></button>
+          </div>
+          </div>
+          <div class="ui cue" id="worksCue"><span class="cue-d">Scroll, or tap the screen, to open the laptop</span><span class="cue-m">Swipe up to open the laptop</span><img src="i/arrow-r.svg" alt="" width="24" height="24"></div>
+        </section>
+
+        <!-- ------------------------------------------------------- 2 · about -->
+        <section class="face f-about" id="about" data-i="2" aria-roledescription="slide" aria-label="About me">
+          <div class="art bg"><img class="bgimg" id="aboutBg" src="a/about-bg.webp" alt="An open notebook lying in a sunlit meadow of daisies, next to an iced matcha" decoding="async" style="left:calc(1.13 * var(--k));top:calc(0 * var(--k));width:calc(1922.1 * var(--k));height:calc(1116.36 * var(--k))"></div>
+          <h2 class="mega about-title">About<br>me</h2>
+          <div class="art fg">
+            <img class="cutout" src="a/about-notebook.webp" alt="" aria-hidden="true" style="left:calc(581.50 * var(--k));top:calc(348.57 * var(--k));width:calc(1090.67 * var(--k));height:calc(729.26 * var(--k))">
+            <img class="cutout cup-shadow" src="a/about-cup-shadow.webp" alt="" aria-hidden="true" style="left:calc(1262.64 * var(--k));top:calc(410.69 * var(--k));width:calc(490.22 * var(--k));height:calc(245.11 * var(--k))">
+            <img class="cutout cup" id="cup" src="a/about-cup.webp" alt="" aria-hidden="true" style="left:calc(1280.80 * var(--k));top:calc(120.19 * var(--k));width:calc(254.19 * var(--k));height:calc(387.16 * var(--k))">
+            <img class="cutout cup-grass" src="a/about-cup-grass.webp" alt="" aria-hidden="true" style="left:calc(1335.27 * var(--k));top:calc(410.69 * var(--k));width:calc(217.88 * var(--k));height:calc(118.02 * var(--k))">
+            <div class="page-ink l" id="inkL" aria-hidden="true">
+              <p class="ink-t who">Who is Rofaida ?</p>
+              <p class="ink-p who">A designer who likes turning little ideas into things people can feel.<br>I&rsquo;m Rofaida a Product Designer with a Graphic Design background, curious about people, obsessed with details, and always looking for the little spark that makes an experience feel special.</p>
+              <p class="ink-why">Always asking<br>Why?</p>
+            </div>
+            <div class="page-ink l stk" id="inkL2" aria-hidden="true">
+              <img class="ink-cat c-white" src="f/s-white.webp" alt="">
+              <img class="ink-cat c-cream" src="f/s-cream.webp" alt="">
+              <img class="ink-cat c-black" src="f/s-black.webp" alt="">
+              <img class="ink-cat c-orange" src="f/s-orange.webp" alt="">
+            </div>
+            <div class="page-ink r" id="inkR" aria-hidden="true">
+              <figure class="pola p1"><img src="f/p-avatar.webp" alt=""><figcaption>me, drawn by me</figcaption></figure>
+              <figure class="pola p2"><img src="f/p-nile.webp" alt=""><figcaption>the Nile</figcaption></figure>
+              <figure class="pola p3"><img src="f/p-matcha.webp" alt=""><figcaption>matcha o'clock</figcaption></figure>
+              <span class="ink-cta">beyond the pixels &rarr;</span>
+            </div>
+            <svg class="pages" viewBox="0 0 1921 1117" preserveAspectRatio="none" aria-hidden="true">
+              <polygon class="pg l" id="pgL" points="885.1,364.3 1221.4,490.5 1019.4,905 617.7,747.4"/>
+              <polygon class="pg r" id="pgR" points="1227.3,490.5 1630.1,568.7 1507.5,1051 1028.7,908.5"/>
+            </svg>
+            <button class="page-hit l" data-sheet="intro" type="button" aria-label="Open the left page: Who is Rofaida?" style="left:calc(617.7 * var(--k));top:calc(364.3 * var(--k));width:calc(603.7 * var(--k));height:calc(540.7 * var(--k));clip-path:polygon(44.32% 0%,100% 23.34%,66.54% 100%,0% 70.85%)"><b>Who is Rofaida?</b></button>
+            <button class="page-hit r" data-sheet="pixels" type="button" aria-label="Open the right page: Beyond the pixels" style="left:calc(1028.7 * var(--k));top:calc(490.5 * var(--k));width:calc(601.4 * var(--k));height:calc(560.5 * var(--k));clip-path:polygon(33.1% 0%,100% 13.95%,79.61% 100%,0% 74.58%)"><b>Beyond the pixels</b></button>
+          </div>
+          <div class="ui cue" id="aboutCue"><span>Pick a page in the notebook</span><img src="i/arrow-r.svg" alt="" width="24" height="24"></div>
+        </section>
+      </div>
+    </div>
+
+    
+  </main>
+
+  <!-- ===================================================== works (inside the laptop) -->
+  <div class="layer works-page" id="worksPage" aria-label="Selected works" role="region" tabindex="-1">
+    <div class="wp-bar">
+      <button class="glass-btn back" id="worksBack" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Back to the meadow</button>
+    </div>
+    <h2 class="sr">Selected works</h2>
+    <div class="stack" id="stack">
+      <div class="folder see" id="seeFolder">
+        <div class="tabrow"><button class="tab" id="seeAll" type="button" style="--x:1429.49"><span>See all projects</span><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button></div>
+        <div class="fbody" aria-hidden="true"></div>
+      </div>
+
+      <article class="folder f1" id="p1" style="--c:#29480E;--ink:#FFFEEB;--ink2:rgba(255,254,235,.72);--ph:#3B5E1C" aria-labelledby="p1t">
+        <div class="tabrow"><a class="tab" href="#p1" data-to="0" style="--x:0"><span>01 &middot; Maaliy</span></a></div>
+        <div class="fbody">
+          <header class="p-head">
+            <h3 class="p-title" id="p1t">Maaliy</h3>
+            <p class="p-lede">Tax deadlines, rebuilt around the client</p>
+            <dl class="p-meta"><div><dt>Discipline</dt><dd>Product design</dd></div><div><dt>Platform</dt><dd>Accounting ERP, Arabic-first</dd></div></dl>
+            <div class="p-tags" aria-label="Scope"><div class="p-tagtrack"><span>User interviews &middot; Information architecture &middot; Dashboard UI &middot; RTL design system &middot;&nbsp;</span><span aria-hidden="true">User interviews &middot; Information architecture &middot; Dashboard UI &middot; RTL design system &middot;&nbsp;</span></div></div>
+          </header>
+          <div class="p-body">
+            <div class="p-copy"><div><p>Accountants were losing tax deadlines in a system that had everything and showed nothing. I rebuilt it around the client instead of the operation.</p><ul class="p-facts"><li>Entries, invoices and taxes merged into one client view</li><li>A summary row that opens into the full client page</li><li>A deadlines calendar with alerts, the top pain in interviews</li><li>One RTL design system across 14+ screens and 7 roles</li></ul></div><button class="p-link" type="button" data-case="maaliy">View case study <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button></div>
+            <figure class="pimg main has-img"><img src="f/works/maaliy-main.webp" alt="Maaliy's dashboard on a tablet: KPIs, revenue trend and the follow-up worklist" width="1600" height="1212" loading="lazy" decoding="async"></figure>
+            <div class="p-side">
+              <figure class="pimg has-img"><img src="f/works/maaliy-d1.webp" alt="Maaliy's dashboard on a laptop" width="1200" height="909" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img src="f/works/maaliy-d2.webp" alt="Two accountants working with Maaliy in an office" width="1200" height="909" loading="lazy" decoding="async"></figure>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="folder f2" id="p2" style="--c:#A6D3E5;--ink:#29480E;--ink2:rgba(41,72,14,.74);--ph:#8EC3D8" aria-labelledby="p2t">
+        <div class="tabrow"><a class="tab" href="#p2" data-to="1" style="--x:464.09"><span>02 &middot; Sadeem</span></a></div>
+        <div class="fbody">
+          <header class="p-head">
+            <h3 class="p-title" id="p2t">Sadeem</h3>
+            <p class="p-lede">A store dashboard that thinks in Arabic</p>
+            <dl class="p-meta"><div><dt>Discipline</dt><dd>Product design</dd></div><div><dt>Platform</dt><dd>Responsive admin panel, RTL</dd></div></dl>
+            <div class="p-tags" aria-label="Scope"><div class="p-tagtrack"><span>Arabic-first UX &middot; RTL layout &middot; Design system &middot; E-commerce &middot;&nbsp;</span><span aria-hidden="true">Arabic-first UX &middot; RTL layout &middot; Design system &middot; E-commerce &middot;&nbsp;</span></div></div>
+          </header>
+          <div class="p-body">
+            <div class="p-copy"><div><p>A single-vendor store dashboard for shop owners who think in Arabic. It reads right to left from the first pixel, not as a mirrored afterthought.</p><ul class="p-facts"><li>State before value: stock is a badge, payment and fulfilment are two states</li><li>A permission matrix of 8 areas &times; 5 actions replaced a wall of checkboxes</li><li>Swappable cards, so owners choose what stays on screen</li><li>33 primitives and 84 semantic tokens across 13 screens</li></ul></div><button class="p-link" type="button" data-case="sadeem">View case study <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button></div>
+            <figure class="pimg main has-img"><img src="f/works/sadeem-main.webp" alt="Sadeem's products table on a monitor, in purple clouds" width="1600" height="1000" loading="lazy" decoding="async"></figure>
+            <div class="p-side">
+              <figure class="pimg has-img"><img src="f/works/sadeem-d1.webp" alt="Editing a product in Sadeem on a laptop" width="1200" height="750" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img src="f/works/sadeem-d2.webp" alt="Sadeem's categories on a desktop monitor" width="1200" height="750" loading="lazy" decoding="async"></figure>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="folder f3" id="p3" style="--c:#ADCF8F;--ink:#29480E;--ink2:rgba(41,72,14,.74);--ph:#97BE76" aria-labelledby="p3t">
+        <div class="tabrow"><a class="tab" href="#p3" data-to="2" style="--x:946.31"><span>03 &middot; Dhi</span></a></div>
+        <div class="fbody">
+          <header class="p-head">
+            <h3 class="p-title" id="p3t">Dhi</h3>
+            <p class="p-lede">Consult, shop and track a room in one app</p>
+            <dl class="p-meta"><div><dt>Discipline</dt><dd>Product design</dd></div><div><dt>Platform</dt><dd>Mobile app, RTL</dd></div></dl>
+            <div class="p-tags" aria-label="Scope"><div class="p-tagtrack"><span>Competitor analysis &middot; Mobile UX &middot; RTL design system &middot; Saudi market &middot;&nbsp;</span><span aria-hidden="true">Competitor analysis &middot; Mobile UX &middot; RTL design system &middot; Saudi market &middot;&nbsp;</span></div></div>
+          </header>
+          <div class="p-body">
+            <div class="p-copy"><div><p>An interior design platform for homes in Saudi Arabia. Competitor apps split consultation, shopping and tracking; Dhi keeps them in one place.</p><ul class="p-facts"><li>A style quiz that gets people to a direction fast</li><li>In-app project chat with the designer, fewer phone calls</li><li>40+ screens on an Arabic RTL design system</li></ul></div><button class="p-link" type="button" data-case="dhi">View case study <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button></div>
+            <figure class="pimg main has-img"><img src="f/works/dhi-main.webp" alt="Dhi's style result screen on a phone, resting on a knitted throw" width="1600" height="1000" loading="lazy" decoding="async"></figure>
+            <div class="p-side">
+              <figure class="pimg has-img"><img src="f/works/dhi-d1.webp" alt="Close-up: “Your style: luxury contemporary”" width="1200" height="750" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img src="f/works/dhi-d2.webp" alt="Close-up: styles close to yours" width="1200" height="750" loading="lazy" decoding="async"></figure>
+            </div>
+          </div>
+        </div>
+      </article>
+      <div class="stack-hold" aria-hidden="true"></div>
+    </div>
+    <div class="see-mobile"><button class="glass-btn solid" type="button" data-allworks>See all projects <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button></div>
+
+    <!-- the keyring, on the sky, after the projects (Figma 332:4851) -->
+    <section class="peek kc" id="play" aria-label="A sneak peek at my mind">
+      <div class="peek-sky sky-drift" aria-hidden="true"><div class="skytrack"><img src="f/sky-sketch.webp" alt="" loading="lazy"><img class="flip" src="f/sky-sketch.webp" alt="" loading="lazy"></div></div>
+      <div class="frame">
+        <div class="sheet" id="sheet">
+          <div class="clip"><img class="peek-grid" src="f/grid.webp" alt="" aria-hidden="true" loading="lazy"></div>
+          <h2 class="peek-title">a sneak peek<br>at my mind</h2>
+          <p class="peek-note l">Everything on this keyring earns its place. Some of it came from five years of Applied Arts and brand work at Zain, some from learning product work at Xperience and MNT-Halan.</p>
+          <p class="peek-note r">Figma for the thinking, After Effects for the motion, Photoshop and Illustrator for everything in between. Framer, Figma Make and Claude for the prototypes.</p>
+          <section class="kc-hero" id="kcHero" aria-label="A keyring of tools and skills. Hover or tab through the charms.">
+            <div class="kc-stage" id="kcStage" data-fit="full">
+              <div class="kc-scaler" id="kcScaler">
+                <canvas id="kcChains"></canvas>
+                <div class="kc-layer" id="kcStills"></div>
+                <div class="kc-hub" id="kcHub"><img src="keychain/k/hub.webp" alt="" decoding="async"></div>
+                <div class="kc-layer" id="kcParts"></div>
+                <div class="kc-layer" id="kcKbds" style="pointer-events:auto"></div>
+              </div>
+            </div>
+            <button class="sr" id="kcSound" aria-pressed="false">Keyring sound</button>
+          </section>
+          <div class="kc-foot"><span>give the keyring a shake</span></div>
+        </div>
+      </div>
+      <span class="tape l" aria-hidden="true"></span><span class="tape r" aria-hidden="true"></span>
+      <footer class="sky-end peek-end sky-hid" aria-label="Footer"><div class="sky-glass"><p>Sky has no limits.</p></div></footer>
+    </section>
+
+      </div>
+
+  <!-- ===================================================== all works -->
+  <div class="layer all-works" id="allWorks" role="dialog" aria-modal="true" aria-labelledby="awTitle" tabindex="-1">
+    <div class="aw-in">
+      <div class="aw-tabrow"><span class="aw-tab">All projects</span>
+        <button class="glass-btn close" id="awClose" type="button" aria-label="Close all works"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+      <div class="aw-body">
+        <div class="aw-head"><h2 class="aw-title" id="awTitle">All Works</h2>
+</div>
+        <div class="awg-filter" role="toolbar" aria-label="Filter works"><span class="awg-lbl" aria-hidden="true">Filter:</span><button type="button" aria-pressed="true" data-g="all">All works</button><button type="button" aria-pressed="false" data-g="case">Case studies</button><button type="button" aria-pressed="false" data-g="ui">App &amp; web UI</button><button type="button" aria-pressed="false" data-g="graphic">Graphics</button></div>
+        <ul class="awg-grid" id="awGrid"></ul>
+        <ol class="awr-list" id="awReel"></ol>
+        <div class="aw-filter" role="toolbar" aria-label="Filter works">
+          <button type="button" aria-pressed="true" data-f="all">ALL</button><span aria-hidden="true">/</span><button type="button" aria-pressed="false" data-f="product">PRODUCT</button><span aria-hidden="true">/</span><button type="button" aria-pressed="false" data-f="graphic">GRAPHIC</button><span aria-hidden="true">/</span><button type="button" aria-pressed="false" data-f="playground">PLAYGROUND</button>
+        </div>
+        <ol class="aw-list" id="awList">
+        <li class="aw-row" data-cat="product" style="--ph:#3B5E1C">
+          <div class="aw-line">
+            <span class="aw-n">001</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm1">Maaliy</button></h3>
+            <p class="aw-desc">Accountants were losing tax deadlines in a system that had everything and showed nothing. I rebuilt it around the client instead of the operation.</p>
+            <button class="aw-btn" type="button" data-case="maaliy">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm1"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Accounting ERP, Arabic-first</b><small>Maaliy</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="product" style="--ph:#8EC3D8">
+          <div class="aw-line">
+            <span class="aw-n">002</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm2">Sadeem</button></h3>
+            <p class="aw-desc">A single-vendor store dashboard for shop owners who think in Arabic. It reads right to left from the first pixel, not as a mirrored afterthought.</p>
+            <button class="aw-btn" type="button" data-case="sadeem">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm2"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Store admin dashboard, RTL</b><small>Sadeem</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="product" style="--ph:#97BE76">
+          <div class="aw-line">
+            <span class="aw-n">003</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm3">Dhi</button></h3>
+            <p class="aw-desc">An interior design platform for homes in Saudi Arabia, with consultation, shopping and project tracking in one app.</p>
+            <button class="aw-btn" type="button" data-case="dhi">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm3"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Interior design app</b><small>Dhi</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="product" style="--ph:#2E6B3F">
+          <div class="aw-line">
+            <span class="aw-n">004</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awmH">MNT-Halan</button></h3>
+            <p class="aw-desc">A product design internship inside a fintech super app: an AI-first Help Center for Borsa, a UAE card application in three steps, the physical card request, and motion handed off as Lottie.</p>
+            <button class="aw-btn" type="button" data-case="halan">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awmH"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Fintech super app, UAE and Egypt</b><small>MNT-Halan</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="product" style="--ph:#7FB9D9">
+          <div class="aw-line">
+            <span class="aw-n">005</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm4">NEXA</button></h3>
+            <p class="aw-desc">UI/UX design for NEXA, an e-commerce shopping app for mobile.</p>
+            <button class="aw-btn" type="button" data-case="nexa">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm4"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>E&#8209;commerce mobile app</b><small>NEXA</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="product" style="--ph:#6E9FC4">
+          <div class="aw-line">
+            <span class="aw-n">006</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm5">VYBE</button></h3>
+            <p class="aw-desc">UI design for VYBE, a mobile app for finding events.</p>
+            <button class="aw-btn" type="button" data-case="vybe">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm5"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Events mobile app</b><small>VYBE</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="product" style="--ph:#A9C7DA">
+          <div class="aw-line">
+            <span class="aw-n">007</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm6">Lumiere</button></h3>
+            <p class="aw-desc">A landing page designed for Lumiere, my 2025 graduation project.</p>
+            <button class="aw-btn" type="button" data-case="lumiere">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm6"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Landing page, graduation 2025</b><small>Lumiere</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="graphic" style="--ph:#B9B39A">
+          <div class="aw-line">
+            <span class="aw-n">008</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm10">Graphic Design Portfolio 2024</button></h3>
+            <p class="aw-desc">A collection of my graphic design work from 2024.</p>
+            <button class="aw-btn" type="button" data-case="gd-2024">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm10"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Selected graphic work</b><small>Graphic Design Portfolio 2024</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="playground" style="--ph:#9CC488">
+          <div class="aw-line">
+            <span class="aw-n">009</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm11">Breadfast and Kilo Kabab campaign</button></h3>
+            <p class="aw-desc">Social media campaign designs for Breadfast and Kilo Kabab.</p>
+            <button class="aw-btn" type="button" data-case="social-posts">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm11"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Campaign posts</b><small>Breadfast and Kilo Kabab campaign</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="playground" style="--ph:#B7A3CF">
+          <div class="aw-line">
+            <span class="aw-n">010</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm12">Traubi</button></h3>
+            <p class="aw-desc">A social media campaign for Traubi.</p>
+            <button class="aw-btn" type="button" data-case="traubi">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm12"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Social media campaign</b><small>Traubi</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        <li class="aw-row" data-cat="playground" style="--ph:#E0A9B6">
+          <div class="aw-line">
+            <span class="aw-n">011</span>
+            <h3 class="aw-name"><button class="aw-toggle" type="button" aria-expanded="false" aria-controls="awm13">Dalya</button></h3>
+            <p class="aw-desc">A social media campaign for Dalya.</p>
+            <button class="aw-btn" type="button" data-case="dalya">View Project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>
+          </div>
+          <div class="aw-more" id="awm13"><div class="aw-more-in"><div class="aw-strip"><figure class="aw-shot pimg lead"><span class="aw-cover"><b>Social media campaign</b><small>Dalya</small></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure><figure class="aw-shot pimg"><span class="ph-in"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#imgIco"/></svg><em>Preview</em></span></figure></div></div></div>
+        </li>
+        </ol>
+        <p class="aw-empty" id="awEmpty" hidden>Nothing pinned here yet.<span>this shelf is being filled, one piece at a time</span></p>
+      </div>
+      <footer class="sky-end sky-hid aw-sky" style="--from:var(--maroon)" aria-label="Footer"><div class="sky-glass"><p>Sky has no limits.</p></div></footer>
+    </div>
+  </div>
+
+  <!-- ===================================================== case study (filled by cases.js) -->
+  <div class="layer case-page" id="casePage" role="dialog" aria-modal="true" tabindex="-1"></div>
+
+  <!-- ===================================================== scrapbook journal (filled by journal.js) -->
+  <div class="journal" id="journal" role="dialog" aria-modal="true" aria-label="Rofaida's journal" aria-hidden="true">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="jRough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.3"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 .85 1 1 1"/></feComponentTransfer></filter></svg>
+    <div class="j-scrim"></div>
+    <div class="j-stage">
+      <div class="j-boards"></div><div class="j-stack l"></div><div class="j-stack r"></div><div class="j-ribbon"></div><div class="j-band"></div>
+      <div class="j-slot l"></div><div class="j-slot r"></div>
+      <div class="j-under l"></div><div class="j-under r"></div>
+      <div class="j-leaf"><div class="j-face front"></div><div class="j-face back"></div></div>
+    </div>
+    <p class="j-hint">drag a page corner to turn &middot; pick things up &middot; open the folded notes</p>
+    <div class="j-ctl"><button class="glass-btn j-prev" type="button" aria-label="Previous page">&lsaquo;</button><span class="j-count" aria-live="polite"></span><button class="glass-btn j-next" type="button" aria-label="Next page">&rsaquo;</button></div>
+    <button class="glass-btn close j-close" type="button" aria-label="Close the journal">&times;</button>
+  </div>
+
+  <!-- ===================================================== notebook sheets -->
+  <div class="sheets" id="sheets" aria-hidden="true">
+    <div class="sheet-scrim" id="sheetScrim"></div>
+    <div class="nb-sheet intro" id="sheetIntro" role="dialog" aria-modal="true" aria-labelledby="ab-title" tabindex="-1" data-w="1383.48" data-h="687.06">
+      <div class="nb-pages" id="nbPages">
+      <div class="side back" id="journeySide" aria-hidden="true"><div class="paper journey" id="journey">
+        <svg class="ab-lines" viewBox="0 0 1383.48 687.06" preserveAspectRatio="none" aria-hidden="true"><g stroke="#CAC3AE" stroke-width=".72" vector-effect="non-scaling-stroke"><line x1="111.8" x2="1281.8" y1="190.4" y2="190.4"/><line x1="111.8" x2="1281.8" y1="227.6" y2="227.6"/><line x1="111.8" x2="1281.8" y1="270.1" y2="270.1"/><line x1="111.8" x2="1281.8" y1="324.1" y2="324.1"/><line x1="111.8" x2="1281.8" y1="378.1" y2="378.1"/><line x1="111.8" x2="1281.8" y1="432.1" y2="432.1"/><line x1="111.8" x2="1281.8" y1="486.1" y2="486.1"/><line x1="111.8" x2="1281.8" y1="540.1" y2="540.1"/></g></svg>
+        <h2 class="ab-title jr-title" id="jr-title">My work<br>journey</h2>
+        <p class="jr-note" aria-hidden="true">tap a stop to read it &rarr;</p>
+        <ol class="jr-list">
+          <li data-job="applied"><span class="jr-dot" aria-hidden="true"></span><button class="jr-pick" type="button" aria-pressed="false" aria-controls="jrDetail"><span class="jr-when">2020 &ndash; 2025</span><b class="jr-role">Visual design</b><span class="jr-where">Faculty of Applied Arts</span></button></li>
+          <li data-job="zain"><span class="jr-dot" aria-hidden="true"></span><button class="jr-pick" type="button" aria-pressed="false" aria-controls="jrDetail"><span class="jr-when">2025 &ndash; 2026</span><b class="jr-role">Graphic designer</b><span class="jr-where">Zain Group &middot; full time</span></button></li>
+          <li data-job="xperience"><span class="jr-dot" aria-hidden="true"></span><button class="jr-pick" type="button" aria-pressed="false" aria-controls="jrDetail"><span class="jr-when">May &ndash; Jul 2026</span><b class="jr-role">UI/UX designer, team lead</b><span class="jr-where">Xperience Software Solutions</span></button></li>
+          <li class="now" data-job="halan"><span class="jr-dot" aria-hidden="true"></span><button class="jr-pick" type="button" aria-pressed="false" aria-controls="jrDetail"><span class="jr-when">Jul 2026 &ndash; now</span><b class="jr-role">Product designer intern</b><span class="jr-where">MNT-Halan</span></button></li>
+        </ol>
+        <aside class="jr-detail" id="jrDetail" aria-live="polite"></aside>
+        <figure class="pola jr-pola" aria-hidden="true"><span class="tape" ></span><img src="f/p-wall.webp" alt=""><figcaption>still learning</figcaption></figure>
+        <button class="turn back" id="turnBack" type="button" aria-label="Turn the page back"><span class="curl" aria-hidden="true"></span><span class="turn-l">turn back</span></button>
+      </div></div>
+      <div class="leaf" id="leaf">
+      <div class="side front"><div class="paper nb-in" id="introIn">
+        <svg class="ab-lines" viewBox="0 0 1383.48 687.06" preserveAspectRatio="none" aria-hidden="true"><g stroke="#CAC3AE" stroke-width=".72" vector-effect="non-scaling-stroke"><line x1="111.8" x2="1281.8" y1="190.4" y2="190.4"/><line x1="111.8" x2="1281.8" y1="227.6" y2="227.6"/><line x1="111.8" x2="1281.8" y1="270.1" y2="270.1"/><line x1="111.8" x2="1281.8" y1="324.1" y2="324.1"/><line x1="111.8" x2="1281.8" y1="378.1" y2="378.1"/><line x1="111.8" x2="1281.8" y1="432.1" y2="432.1"/><line x1="111.8" x2="1281.8" y1="486.1" y2="486.1"/><line x1="111.8" x2="1281.8" y1="540.1" y2="540.1"/><line x1="224.9" x2="224.9" y1="146.4" y2="566.4"/></g></svg>
+        <h2 class="ab-title" id="ab-title">A little<br>about me</h2>
+        <p class="ab-copy" id="abCopy">A designer who likes turning little ideas into things people can feel.<br> I&rsquo;m Rofaida a Product Designer with a Graphic Design background, curious about people, obsessed with details, and always looking for the little spark that makes an experience feel special.</p>
+        <p class="ab-why" aria-hidden="true">Always asking<br>Why<span class="q">?</span></p>
+        <img class="sticker cream" tabindex="0" src="f/s-cream.webp" alt="Sticker: a cream cat with blue eyes. Drag it around." draggable="false" style="left:calc(58.3 * var(--s));top:calc(382.1 * var(--s));width:calc(159.1 * var(--s));height:calc(171.2 * var(--s))">
+        <img class="sticker black" tabindex="0" src="f/s-black.webp" alt="Sticker: a grumpy black cat. Drag it around." draggable="false" style="left:calc(118.3 * var(--s));top:calc(451.8 * var(--s));width:calc(172.7 * var(--s));height:calc(186 * var(--s))">
+        <img class="sticker orange" src="f/s-orange.webp" alt="Sticker: a ginger cat with a question mark" draggable="false" style="left:calc(1143 * var(--s));top:calc(439.3 * var(--s));width:calc(175 * var(--s));height:calc(162 * var(--s))">
+        <img class="sticker white" tabindex="0" src="f/s-white.webp" alt="Sticker: a fluffy white and black cat. Drag it around." draggable="false" style="left:calc(1172.4 * var(--s));top:calc(101.9 * var(--s));width:calc(158.5 * var(--s));height:calc(137.5 * var(--s))">
+        <button class="turn" id="turnBtn" type="button" aria-label="Turn the page to see my work journey"><span class="curl" aria-hidden="true"></span><span class="turn-l">turn the page</span></button>
+      </div></div>
+        <div class="leaf-rev" aria-hidden="true"><div class="paper"></div></div>
+        <div class="leaf-shade" aria-hidden="true"></div>
+      </div>
+      <div class="under-shade" aria-hidden="true"></div>
+      </div>
+      <button class="glass-btn close" type="button" data-close aria-label="Close and put the page back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="nb-sheet pixels" id="sheetPixels" role="dialog" aria-modal="true" aria-labelledby="px-title" tabindex="-1" data-w="1328.03" data-h="828.06">
+      <div class="side"><div class="paper nb-in" id="pxCanvas">
+        <h2 class="px-title" id="px-title"><span class="a">Beyond the</span> <span class="b" id="pxWord">Pixels</span></h2>
+        <figure class="ph" tabindex="0" data-n="salad-bowls.jpg" style="left:calc(104.2 * var(--s));top:calc(44 * var(--s));width:calc(178.6 * var(--s));height:calc(133.9 * var(--s))"><img src="f/p-bowls.webp" alt="Three wooden bowls of salad with green dressing"></figure>
+        <figure class="ph" tabindex="0" data-n="manama.jpg" style="left:calc(955.5 * var(--s));top:calc(59.7 * var(--s));width:calc(119 * var(--s));height:calc(158.7 * var(--s))"><img src="f/p-bahrain.webp" alt="Rofaida on a boat with a city skyline behind her"></figure>
+        <figure class="ph" tabindex="0" data-n="makkah.jpg" style="left:calc(1059.1 * var(--s));top:calc(83.4 * var(--s));width:calc(111.4 * var(--s));height:calc(128.3 * var(--s))"><img src="f/p-makkah.webp" alt="A street in Makkah at night"></figure>
+        <figure class="ph" tabindex="0" data-n="beach-night.jpg" style="left:calc(992.8 * var(--s));top:calc(206 * var(--s));width:calc(190 * var(--s));height:calc(122.7 * var(--s))"><img src="f/p-scarf.webp" alt="Rofaida wrapped in a scarf on a beach at night"></figure>
+        <figure class="ph" tabindex="0" data-n="eggs.jpg" style="left:calc(982.5 * var(--s));top:calc(544.4 * var(--s));width:calc(153.3 * var(--s));height:calc(181.2 * var(--s))"><img src="f/p-eggs.webp" alt="Two fried eggs with chilli flakes in a pan"></figure>
+        <figure class="ph" tabindex="0" data-n="sourdough.jpg" style="left:calc(1059.1 * var(--s));top:calc(445.8 * var(--s));width:calc(167.1 * var(--s));height:calc(166.8 * var(--s))"><img src="f/p-bread.webp" alt="A loaf of homemade sourdough on a cooling rack"></figure>
+        <figure class="ph" tabindex="0" data-n="matcha-desk.jpg" style="left:calc(550.8 * var(--s));top:calc(626.5 * var(--s));width:calc(233.4 * var(--s));height:calc(124.1 * var(--s))"><img src="f/p-laptop.webp" alt="A laptop on a video call next to an iced matcha"></figure>
+        <figure class="ph" tabindex="0" data-n="matcha-girl.png" style="left:calc(711.2 * var(--s));top:calc(552.9 * var(--s));width:calc(130 * var(--s));height:calc(142.9 * var(--s))"><img src="f/p-matcha.webp" alt="Cartoon of a girl in sunglasses sipping matcha"></figure>
+        <figure class="ph" tabindex="0" data-n="dream-desk.png" style="left:calc(175.4 * var(--s));top:calc(471.5 * var(--s));width:calc(249.5 * var(--s));height:calc(141.3 * var(--s))"><img src="f/p-desk.webp" alt="Illustration of a cosy desk with posters and a lamp"></figure>
+        <figure class="ph" tabindex="0" data-n="me-wall.jpg" style="left:calc(84.4 * var(--s));top:calc(534 * var(--s));width:calc(154.2 * var(--s));height:calc(191.5 * var(--s))"><img src="f/p-wall.webp" alt="Rofaida in front of a wall of anime posters"></figure>
+        <figure class="ph" tabindex="0" data-n="sushi.jpg" style="left:calc(274 * var(--s));top:calc(70.7 * var(--s));width:calc(138.3 * var(--s));height:calc(136.3 * var(--s))"><img src="f/p-sushi.webp" alt="A platter of sushi rolls and noodles"></figure>
+        <figure class="ph" tabindex="0" data-n="nile-sunset.jpg" style="left:calc(81.7 * var(--s));top:calc(138.8 * var(--s));width:calc(111.8 * var(--s));height:calc(149 * var(--s))"><img src="f/p-nile.webp" alt="Sunset over the Nile from under a parasol"></figure>
+        <figure class="ph" tabindex="0" data-n="sinai-7.jpg" style="left:calc(175.4 * var(--s));top:calc(173.3 * var(--s));width:calc(174.3 * var(--s));height:calc(124.3 * var(--s))"><img src="f/p-ship.webp" alt="The bridge of a ferry named Sinai 7"></figure>
+        <figure class="ph" tabindex="0" data-n="plane.png" style="left:calc(1081.9 * var(--s));top:calc(130.5 * var(--s));width:calc(191.6 * var(--s));height:calc(123.7 * var(--s))"><img src="f/p-plane.webp" alt="A white passenger plane"></figure>
+        <figure class="ph" tabindex="0" data-n="sketching.jpg" style="left:calc(663.5 * var(--s));top:calc(50.3 * var(--s));width:calc(165.1 * var(--s));height:calc(113.6 * var(--s))"><img src="f/p-sketch.webp" alt="A hand sketching a building in watercolour"></figure>
+        <figure class="ph" tabindex="0" data-n="iced-latte.jpg" style="left:calc(1135.8 * var(--s));top:calc(591.3 * var(--s));width:calc(83.3 * var(--s));height:calc(112 * var(--s))"><img src="f/p-latte.webp" alt="A glass of iced latte in the sun"></figure>
+        <figure class="ph" tabindex="0" data-n="survey-corps.png" style="left:calc(676.7 * var(--s));top:calc(146.3 * var(--s));width:calc(102.4 * var(--s));height:calc(102.3 * var(--s))"><img src="f/p-aot.webp" alt="Anime still of two characters in uniform"></figure>
+        <figure class="ph" tabindex="0" data-n="self-portrait.png" style="left:calc(553.9 * var(--s));top:calc(83.4 * var(--s));width:calc(130.5 * var(--s));height:calc(130.5 * var(--s))"><img src="f/p-avatar.webp" alt="Illustrated self-portrait of Rofaida in a red scarf"></figure>
+        <figure class="ph" tabindex="0" data-n="cat-at-work.jpg" style="left:calc(217.8 * var(--s));top:calc(594.6 * var(--s));width:calc(112.4 * var(--s));height:calc(111.6 * var(--s))"><img src="f/p-catlaptop.webp" alt="A cat yawning in front of a laptop"></figure>
+        <figure class="ph" tabindex="0" data-n="ceo-cat.png" style="left:calc(507.3 * var(--s));top:calc(563.4 * var(--s));width:calc(153.6 * var(--s));height:calc(141.2 * var(--s))"><img src="f/p-catsuit.webp" alt="A cat in a suit holding an iced coffee"></figure>
+        <div class="sel" id="sel" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b id="selLabel"></b></div>
+        <p class="px-hint">drag them around, or tap one to look closer</p>
+      </div></div>
+      <button class="glass-btn close" type="button" data-close aria-label="Close and put the page back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo" hidden>
+    <div class="lb-scrim" data-lbclose></div>
+    <div class="lb-stage">
+      <figure class="lb-pola" id="lbPola"><span class="lb-photo"><img id="lbImg" src="" alt=""></span><figcaption id="lbCap"></figcaption></figure>
+      <div class="lb-nav">
+        <button class="glass-btn lb-btn" id="lbPrev" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="lb-count" id="lbCount" aria-live="polite"></span>
+        <button class="glass-btn lb-btn" id="lbNext" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+    <button class="glass-btn close lb-close" type="button" data-lbclose aria-label="Close photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </div>
+
+  <!-- ===================================================== let's talk (through the headphones) -->
+  <div class="layer contact-page" id="contactPage" role="dialog" aria-modal="true" aria-labelledby="talkH" tabindex="-1">
+    <section class="talk" id="contact">
+      <div class="talk-sky sky-drift" aria-hidden="true"><div class="skytrack"><img src="f/sky-talk.webp" alt="" loading="lazy"><img class="flip" src="f/sky-talk.webp" alt="" loading="lazy"></div></div>
+      <div class="talk-hill" aria-hidden="true"><img src="f/hill.webp" alt="" loading="lazy"></div>
+      <div class="frame">
+        <div class="glass" id="glass">
+          <h2 class="talk-h" id="talkH">Let's talk</h2>
+          <p class="talk-p">I'm open to product design roles and selected freelance work. Arabic-first products especially. That's where I'm most useful.</p>
+          <div class="talk-actions">
+            <a class="t-btn main" href="mailto:rofaidaabdalwahap@gmail.com" id="mailBtn" data-copy="rofaidaabdalwahap@gmail.com">Email me <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></a>
+            <a class="t-btn" href="https://www.linkedin.com/in/rofaida-abdelwahap-3187a1399" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="t-btn" href="https://www.behance.net/rofaidaabdelwap" target="_blank" rel="noopener">Behance</a>
+            <a class="t-btn" href="https://drive.google.com/file/d/1btNfa-B7rLPgWYI5pzXkS12cbSmnBby5/view?usp=sharing" target="_blank" rel="noopener">Resume</a>
+          </div>
+          <p class="talk-mail"><span>rofaidaabdalwahap@gmail.com</span></p>
+          <p class="talk-status"><i></i>Available for new work &middot; Cairo, <span id="cairoTime">--:--</span></p>
+        </div>
+        <div class="cloud c1" aria-hidden="true"><img src="f/cloud-a.webp" alt="" loading="lazy"></div>
+        <div class="cloud c2" aria-hidden="true"><img src="f/cloud-a.webp" alt="" loading="lazy"></div>
+        <div class="cloud c3" aria-hidden="true"><img src="f/cloud-b.webp" alt="" loading="lazy"></div>
+        <div class="sky-glass talk-glass"><p>Sky has no limits.</p></div>
+        <p class="talk-foot">&copy; 2026 Rofaida Abdelwahap &middot; Illustrations drawn by Rofaida &middot; Made in Cairo</p>
+        <button class="talk-me" id="talkMe" type="button" aria-label="Say hi to Rofaida"><span class="ring" aria-hidden="true"></span><span class="ring r2" aria-hidden="true"></span><span class="avface"><img src="f/avatar.webp" alt="Illustrated portrait of Rofaida in a red scarf and green jacket" loading="lazy"></span><span class="online" aria-hidden="true"></span></button>
+      </div>
+    </section>
+    <button class="glass-btn close c-close" id="contactClose" type="button" aria-label="Close and go back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  </div>
+
+  <div class="viewcur" id="viewCur" aria-hidden="true">View</div>
+  <div class="ptip" id="ptip" aria-hidden="true"><span class="ptip-pill"><span class="ptip-t" id="ptipT"></span></span><i class="ptip-dot"></i></div>
+  <div class="kc-tip" id="kcTip" role="status" aria-live="polite"></div>
+  <div class="live sr" id="live" aria-live="polite"></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="arrUR" viewBox="0 0 24 24"><path d="M18.75 6v9.75a.75.75 0 0 1-1.5 0V7.81L6.53 18.53a.75.75 0 0 1-1.06-1.06L16.19 6.75H8.25a.75.75 0 0 1 0-1.5H18a.75.75 0 0 1 .75.75Z" fill="currentColor"/></symbol>
+      <symbol id="imgIco" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="M4 17.5l5.2-4.6 3.4 3 3-2.6 4.4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -12,7 +12,8 @@ Upload the **contents of `site/`** to any static host and point your domain at i
 
 | Host | How |
 | --- | --- |
-| Netlify (current) | Connected to this repo: every push to `main` redeploys. Publish directory `site` is set in `netlify.toml`. |
+| Cloudflare Pages (current) | Every push to `main` deploys `site/` to https://rofaidas-portfolio.pages.dev through `.github/workflows/cloudflare-pages.yml`. Needs two repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. |
+| Netlify | `netlify.toml` publishes `site`. Note: `netlify.app` addresses are blocked on some networks in the region. |
 | Vercel | Import the repo; `vercel.json` serves `site/`. |
 | Cloudflare Pages | Connect the repo, build command empty, output directory `site`. |
 | Any server (Nginx, Apache, cPanel) | Copy the contents of `site/` into the web root. |

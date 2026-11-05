@@ -2,7 +2,8 @@
 
 The portfolio website of **Rofaida Abdelwahap**, product and visual designer.
 A hand-painted world you move through: Home, Selected works and About me are faces of one turning scene,
-with case studies (Maaliy, Sadeem, Dhi, MNT-Halan), app and web UI (NEXA, VYBE, Lumiere) and graphics.
+with case studies (Maaliy, Sadeem, Dhi, MNT-Halan), app and web UI (NEXA, VYBE, Lumiere) and graphics
+(Graphic Design Portfolio 2024, Breadfast and Kilo Kabab, Traubi, Dalya).
 
 ## Deploy
 
@@ -36,13 +37,14 @@ site/
   index.html        page markup
   css/style.css     all styles
   js/main.js        all behaviour (the turning world, works, case studies, About, journal, keychain)
+  js/videos.js      drops video players whose video file isn't included, so their poster shows
   f/                project images (one folder per case study: maaliy/, sadeem/, halan/, works/ ...)
   a/                backgrounds, sky and the meow sound
   l/                the painted hero layers (day and night)
   keychain/         the skills keychain
   m/                the "meadow sound" music
   i/                icons
-  data/edits.json   text edits (empty; only used inside the Claude artifact editor)
+  data/edits.json   text edits saved from the page editor (applied on load)
 ```
 
 ## Editing content

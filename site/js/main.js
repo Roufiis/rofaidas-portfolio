@@ -492,12 +492,8 @@
     } };
   }
   var soundBtn = $("#soundBtn"), kcSound = $("#kcSound");
-  soundBtn.addEventListener("click", function () {
-    var on = soundBtn.getAttribute("aria-pressed") !== "true";
-    soundBtn.setAttribute("aria-pressed", String(on));
-    if (on) startAmbient(); else if (ambient) { ambient.stop(); ambient = null; }
-    if (kcSound && kcSound.getAttribute("aria-pressed") !== String(on)) kcSound.click();
-  });
+  /* the menu's sound icon plays and pauses the home soundtrack (the "Feel the vibes" player); both stay in sync */
+  soundBtn.addEventListener("click", function () { if (R.toggleMusic) R.toggleMusic(); });
   R.soundOn = function () { return soundBtn.getAttribute("aria-pressed") === "true"; };
 
   /* ============================================================ home room */
@@ -619,11 +615,11 @@
   addEventListener("wheel", function () { if (tip.text === "oi. scroll down") hideTip(); }, { passive: true });
 
   /* =================================================== cursor parallax
-     Home's hill (after the opening zoom), Selected works and About lean a little away from the cursor,
+     Selected works and About lean a little away from the cursor,
      eased so it drifts rather than tracks. */
   if (fine && !reduced) {
     var par = R.par = { x: 0, y: 0, tx: 0, ty: 0, raf: 0 };
-    var parEls = $$(".f-about .art.bg, .f-about .art.fg, .f-works .art.bg, .f-works .art.wfg, .f-works .art.fx, #plate");
+    var parEls = $$(".f-about .art.bg, .f-about .art.fg, .f-works .art.bg, .f-works .art.wfg, .f-works .art.fx");   /* Home's hill stays still: its lean read as the picture sliding after the zoom */
     var parLoop = function () {
       par.x += (par.tx - par.x) * 0.045; par.y += (par.ty - par.y) * 0.045;
       /* only the layers that lean get the new numbers, so the page isn't restyled */
@@ -697,32 +693,76 @@
     playing = on;
     vPlay.setAttribute("aria-pressed", String(on)); vPlay.setAttribute("aria-label", on ? "Pause the sound bath" : "Play the sound bath");
     site.toggleAttribute("data-playing", on);
+    soundBtn.setAttribute("aria-pressed", String(on)); soundBtn.setAttribute("aria-label", on ? "Pause the soundtrack" : "Play the soundtrack");
+    if (kcSound && kcSound.getAttribute("aria-pressed") !== String(on)) kcSound.click();
   }
   /* a play() cut short by the swap is fine; only a refusal stops the player */
   function playSafe() { var p = au.play(); if (p && p.catch) p.catch(function (e) { if (!e || e.name !== "AbortError") setPlaying(false); }); }
-  var blobState = 0;                       /* 0 not fetched, 1 fetching, 2 swapped in */
+  /* The track is also fetched whole and played from memory (looping and seeking work even where the host
+     can't serve byte ranges). It is fetched in the background from the first interaction and swapped in only while
+     the player is paused: swapping mid-play cut the sound and needed a second play() outside the click,
+     which some browsers refuse; that is what made the button seem to do nothing. */
+  var blobState = 0, blobUrl = "";          /* 0 not fetched, 1 fetching, 2 ready, 3 swapped in */
   function ensureBlob() {
     if (blobState || !window.fetch || !URL.createObjectURL) return; blobState = 1;
     fetch(au.getAttribute("src")).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) {
-      var t = playing ? au.currentTime : pos, url = URL.createObjectURL(b);
-      au.src = url; blobState = 2;
-      au.addEventListener("loadedmetadata", function once() { au.removeEventListener("loadedmetadata", once); au.currentTime = t; if (playing) playSafe(); });
+      blobUrl = URL.createObjectURL(b); blobState = 2; swapIn();
     }).catch(function () { blobState = 0; });
   }
+  function swapIn() {
+    if (blobState !== 2 || playing) return;
+    au.src = blobUrl; blobState = 3;
+    au.addEventListener("loadedmetadata", function once() { au.removeEventListener("loadedmetadata", once); if (!playing) au.currentTime = pos; });
+  }
+  /* start the background fetch on the visitor's first interaction, so passive visits don't download it */
+  ["pointerdown", "keydown"].forEach(function (t) { addEventListener(t, function once() { removeEventListener(t, once, true); ensureBlob(); }, true); });
   function vTick() { if (!playing) return; pos = au.currentTime % LEN; showPos(); vRaf = requestAnimationFrame(vTick); }
   function startMusic() {
     if (Math.abs(au.currentTime - pos) > 0.5) au.currentTime = pos;
     au.volume = 0; setPlaying(true); playSafe();
-    fadeTo(VOL, 900); cancelAnimationFrame(vRaf); vTick(); ensureBlob();
+    fadeTo(VOL, 900); cancelAnimationFrame(vRaf); vTick(); ensureBlob();   /* no-op once fetched */
   }
   function stopMusic() {
     if (!playing) return;
     setPlaying(false); cancelAnimationFrame(vRaf);
-    fadeTo(0, 450, function () { if (!playing) au.pause(); });
+    fadeTo(0, 450, function () { if (!playing) { au.pause(); swapIn(); } });
   }
   vPlay.addEventListener("click", function () { if (playing) stopMusic(); else startMusic(); });
-  vSeek.addEventListener("input", function () { pos = +vSeek.value; showPos(); au.currentTime = pos; });
+  vSeek.addEventListener("input", function () {
+    pos = +vSeek.value; showPos();
+    /* seeking can need the in-memory copy; swapping on the visitor's own seek is safe */
+    if (playing && blobState === 2) {
+      au.src = blobUrl; blobState = 3;
+      au.addEventListener("loadedmetadata", function once() { au.removeEventListener("loadedmetadata", once); au.currentTime = pos; if (playing) playSafe(); });
+    } else au.currentTime = pos;
+  });
   R.stopMusic = stopMusic;
+  R.toggleMusic = function () { if (playing) stopMusic(); else startMusic(); };
+
+  /* ---- the strip above the page (status bar / app bar on phones) takes the colour at the top of what is
+     on screen, instead of always the sky blue */
+  var themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (!themeMeta) { themeMeta = document.createElement("meta"); themeMeta.name = "theme-color"; document.head.appendChild(themeMeta); }
+  var topRaf = 0, lastTop = "";
+  function opaqueBg(el) {
+    for (; el && el !== document.documentElement; el = el.parentElement) {
+      var s = getComputedStyle(el), c = s.backgroundColor, m = c.match(/rgba?\(([^)]+)\)/);
+      if (m) { var p = m[1].split(",").map(parseFloat); if (p.length < 4 || p[3] > 0.6) return c; }
+      if (s.backgroundImage && s.backgroundImage !== "none") { var g = s.backgroundImage.match(/rgba?\([^)]+\)|#[0-9a-f]{3,8}/i); if (g) return g[0]; }
+    }
+    return "";
+  }
+  function syncTop() {
+    topRaf = 0;
+    var gn = document.getElementById("gnav"), list = document.elementsFromPoint ? document.elementsFromPoint(innerWidth / 2, 2) : [], c = "";
+    for (var i = 0; i < list.length && !c; i++) { if (gn && gn.contains(list[i])) continue; c = opaqueBg(list[i]); }
+    if (!c || c === lastTop) return;
+    lastTop = c; document.documentElement.style.background = c; document.body.style.background = c; themeMeta.content = c;
+  }
+  function queueTop() { if (!topRaf) topRaf = requestAnimationFrame(syncTop); }
+  addEventListener("scroll", queueTop, true); addEventListener("resize", queueTop);
+  new MutationObserver(function () { setTimeout(queueTop, 60); setTimeout(queueTop, 900); }).observe(site, { attributes: true, attributeFilter: ["data-mode", "data-face", "class"] });
+  setInterval(queueTop, 1500);
 
   /* ================================================================== boot */
   measure();
@@ -745,6 +785,7 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var R = window.R2, site = $("#site"), home = $("#home");
   var artBg = $("#home .art.bg"), plate = $("#plate"), close = $("#closePlate");
+  var wideSoft = $("#wideSoft"), closeSoft = $("#closeSoft");
   var backdrop = $("#introBackdrop"), vig = $("#introVig"), cue = $("#introCue");
   var reveal = Array.prototype.slice.call($("#home .home-ui").children).concat([$("#hint")]);
 
@@ -762,6 +803,14 @@
     content: [0.74, 0.97],
     alive: 0.55            /* the scene wakes once the camera has swung past */
   };
+  /* phones and touch screens: the same move, lighter to draw. The defocus steps through a few fixed radii
+     (re-blurring a huge layer every frame is what made the zoom stutter on iPhone), and the screen-blended
+     glow and the tilt are left out. Desktop is unchanged. */
+  var LITE = matchMedia("(max-width:760px), (hover:none)").matches;
+  if (LITE) { CFG.blurMax = 12; CFG.glow = 0; CFG.tilt = 0; }
+  /* the defocus moves in steps (4 px on phones, 2 px elsewhere): every new radius means re-blurring a very
+     large layer, and doing that on every frame is what made the zoom stutter, on computers too */
+  var blurStep = function (b) { return Math.round(b / (LITE ? 4 : 2)) * (LITE ? 4 : 2); };
   var ghosts = Array.prototype.slice.call(document.querySelectorAll("#closePlate .ghost")), ghost = ghosts[0], closeInner = $("#closePlate .inner");
   var clamp01 = function (v) { return v < 0 ? 0 : v > 1 ? 1 : v; };
   var smooth = function (a, b, t) { var x = clamp01((t - a) / (b - a)); return x * x * (3 - 2 * x); };
@@ -826,10 +875,11 @@
     x = clamp01(x);
     var U = U0 * Math.pow(U1 / U0, x);
     var Pp = path(x), Sx = Pp.x, Sy = Pp.y;
-    var bell = bellAt(x, HAND.mid), pixOn = PIX.ok, blur = pixOn ? 0 : bell * CFG.blurMax, roll = pixOn ? 0 : bell * CFG.tilt;
+    var bell = bellAt(x, HAND.mid), pixOn = PIX.ok, blur = pixOn ? 0 : blurStep(bell * CFG.blurMax), roll = pixOn ? 0 : bell * CFG.tilt;
     var opC = 1 - smooth(HAND.start, HAND.end, x);
     var opW = smooth(Math.max(0, HAND.start - 0.05), Math.max(0.02, HAND.end - 0.05), x);
-    var f = blur > 0.08 ? "blur(" + blur.toFixed(2) + "px)" : "";
+    var f = "", soft = Math.min(1, bell * 1.35).toFixed(3);   /* no live CSS blur: the soft copies carry the defocus */
+    if (wideSoft) wideSoft.style.opacity = x >= 1 ? 0 : soft; if (closeSoft) closeSoft.style.opacity = soft;
     var covered = PIX.draw(x, Sx, Sy, U);
     if (covered) { artBg.style.visibility = "hidden"; close.style.visibility = "hidden"; }
     else if (x >= 1) { artBg.style.transform = ""; artBg.style.opacity = ""; artBg.style.filter = ""; artBg.style.visibility = ""; }
@@ -850,7 +900,7 @@
     /* the glow: a blurred, screen-blended copy of the picture swells with the
        defocus (bloom), plus a soft pale light over the frame; both peak at 20% */
     var g = bell * CFG.glow, night = site.getAttribute("data-theme") === "night";
-    ghosts.forEach(function (gh) {
+    if (!LITE || g > 0) ghosts.forEach(function (gh) {
       var mine = gh.classList.contains("nightimg") === night;
       gh.style.opacity = mine ? g.toFixed(3) : "0";
       gh.style.transform = g > 0.004 ? "scale(" + (1 + bell * CFG.smear).toFixed(4) + ")" : "none";
@@ -858,7 +908,7 @@
     vig.style.opacity = g.toFixed(3);
     /* as the hill settles into its band, its top melts into the sky */
     var land = smooth(Math.max(0, WIDE_LIMIT - 0.06), 1, x);
-    var mB = (land * 16).toFixed(1);
+    var mB = (land * 16).toFixed(0);   /* whole percents: each change repaints the masked plate */
     if (mB !== lastMB) { plate.style.setProperty("--mA", "0%"); plate.style.setProperty("--mB", mB + "%"); lastMB = mB; }
     backdrop.style.opacity = (1 - land).toFixed(3);
     var alive = x > CFG.alive;
@@ -871,7 +921,9 @@
       el.style.transform = x >= 1 ? "" : "translate3d(0," + ((1 - v) * 28).toFixed(2) + "px,0)";
     });
     cue.style.setProperty("--cue", (1 - smooth(0, 0.14, x)).toFixed(3));
-    if ((x < 1) !== site.hasAttribute("data-intro")) site.toggleAttribute("data-intro", x < 1);
+    if ((x < 1) !== site.hasAttribute("data-intro")) {
+      site.toggleAttribute("data-intro", x < 1);
+    }
   }
 
   /* no pixel dissolve in this version: the move is a clean optical defocus
@@ -1035,6 +1087,13 @@
   /* and back out of the screen, onto the hill: the dive played in reverse.
      The projects sink back down into the cream screen, the camera pulls out of
      the laptop, the screen flickers off and the title floats back in. */
+  /* phones: each folder sticks once its bottom reaches the screen's bottom, so the next one slides over it */
+  function stickFolders() {
+    var phone = matchMedia("(max-width:760px)").matches, vh = innerHeight;
+    $$("#stack .folder:not(.see)").forEach(function (f) { f.style.setProperty("--stick", phone ? Math.min(0, vh - f.offsetHeight) + "px" : "0px"); });
+  }
+  addEventListener("resize", stickFolders); addEventListener("load", stickFolders); setTimeout(stickFolders, 1200);
+  if (window.ResizeObserver) new ResizeObserver(stickFolders).observe($("#stack"));
   R.exitWorks = function (then) {
     if (busy) return;
     var m = site.getAttribute("data-mode"); if (m !== "works" && m !== "all") { if (then) then(); return; }
@@ -1221,12 +1280,12 @@
   var body = $(".aw-body", all), grid = $("#awGrid"), vbtns = $$(".aw-view button"), gbtns = $$(".awg-filter button");
   var CASE_IDS = { maaliy: 1, sadeem: 1, dhi: 1, halan: 1 };
   function gkind(cat, id) { return CASE_IDS[id] ? "case" : cat === "product" ? "ui" : "graphic"; }   /* Oct 2026: branding, graphics and social media are one "Graphics" filter */
-  var KIND_LBL = { "case": "Case study", ui: "App UI", graphic: "Graphics" };
+  var KIND_LBL = { "case": "Case study", ui: "App UI", graphic: "Graphics & illustrations" };
   rows.forEach(function (r) {
     var btn = r.querySelector(".aw-btn"), id = btn && btn.getAttribute("data-case"), cover = r.querySelector(".aw-cover b"), name = r.querySelector(".aw-toggle").textContent;
     var k = gkind(r.getAttribute("data-cat"), id), li = document.createElement("li");
     li.className = "awg-item"; li.setAttribute("data-g", k); li.style.setProperty("--ph", r.style.getPropertyValue("--ph"));
-    li.innerHTML = '<button class="awg-card" type="button" data-case="' + id + '"><span class="awg-cover pimg"><b>' + (cover ? cover.innerHTML : "") + '</b><small>' + (id === "halan" ? "Internship" : "On Behance") +
+    li.innerHTML = '<button class="awg-card" type="button" data-case="' + id + '"><span class="awg-cover pimg"><b>' + (cover ? cover.innerHTML : "") + '</b><small>' + (id === "halan" ? "Internship" : id === "snapchat" ? "Project page" : "On Behance") +
       '</small><i class="awg-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#arrUR"/></svg></i></span><span class="awg-name">' + name + '</span><span class="awg-kind">' + KIND_LBL[k] + "</span></button>";
     grid.appendChild(li);
   });
@@ -1282,7 +1341,7 @@
       var desc = (r.querySelector(".aw-desc") || {}).textContent || "", cover = r.querySelector(".aw-cover b"), k = gkind(r.getAttribute("data-cat"), id);
       var info = (R.caseReel && R.caseReel(id)) || { imgs: [], labels: [], tags: [] }, tiles = [];
       if (!(info.imgs[0] && info.imgs[0][0].indexOf("/") >= 0)) tiles.push('<figure class="awr-tile cover pimg"><b>' + (cover ? cover.innerHTML : esc2(name)) + "</b><small>" + esc2(name) + "</small></figure>");
-      info.imgs.slice(0, 6).forEach(function (im) {
+      info.imgs.slice(0, id === "gd-2024" || id === "dhi" || id === "dalya" || id === "social-posts" || id === "snapchat" ? 12 : 6).forEach(function (im) {
         /* phone screens (Halan) sit in a phone frame; boards and mock-ups (Sadeem) keep their own shape */
         if (im[0].indexOf("/") < 0) tiles.push('<figure class="awr-tile shot"><img src="f/halan/' + im[0] + '.webp" alt="" decoding="async"></figure>');
         else tiles.push('<figure class="awr-tile pic"' + (im[2] ? ' style="aspect-ratio:' + im[2] + "/" + im[3] + '"' : "") + '><img src="' + im[0] + '" alt="" decoding="async"></figure>');
@@ -1584,7 +1643,10 @@
       tldr: [["The problem", "Customers moved between showrooms, Instagram and phone calls with no clear path. Trust was weak, and the company couldn't reach remote regions or people with physical disabilities."],
              ["What I did", "Researched two competitors across 14 features, mapped the market gap, then designed one app for shopping, design consultations and live project tracking."],
              ["The impact", "Dhi is the only one of the three that offers design consultations with a clear way to request them. The consultation page went from 9 sections to 6."]],
+      /* All works strip only (Nov 2): her presentation boards, not shown on the case page */
+      reel: [["hero", "Dhi cover: the line Every home has its light, in Arabic, on deep green beside a warm living room", 1600, 828], ["splash", "The Dhi app splash screen with the bilingual logo, on a phone resting on green padded leather", 1600, 1068], ["context", "Two boards: Dhi is a Saudi interior design company, and the project is a mobile app that unifies its customer journey", 1600, 1398], ["market-audience", "Boards for the market gap and the target audience, beside two warm interior renders", 1600, 1776], ["moodboard", "The Dhi moodboard: olive velvet, walnut wood, brass and afternoon light, with the logo", 1600, 1044], ["billboard", "A green Dhi billboard on a ribbed wall: Details make the difference, beside a framed tapestry", 1600, 890], ["home", "The Dhi shop home screen, browse by room and a limited-time offer, on a phone in a marble stand", 1600, 1200], ["booking-hand", "The first step of booking a consultation, home type and own or rent, on a phone in someone’s hand", 1600, 1187], ["booking-flow", "Six screens of the consultation booking: home type, condition, rooms, budget and timing, details, and confirmation", 1600, 1280], ["style-mock", "The style result on a phone lying on an olive throw", 1400, 1915], ["phones", "Three phones in real settings: the style quiz, the style result, and the product list", 1600, 732]],
       cover: "Interior design app",
+      coverImg: ["hero", "Dhi: the line Every home has its light, in Arabic, on deep green beside a warm living room", 1600, 828],
       stats: [["40+", "screens"], ["5", "tabs in one app"], ["14", "features compared with 2 competitors"], ["30%", "shorter consultation page"]],
       sections: [
         /* ------------------------------------------------ 1 · problem */
@@ -1662,14 +1724,42 @@
                   ["People think in rooms, not packages.", "Rooms first, then the system suggests the right package.", "No one has to decode package names."],
                   ["Most people have a range, not an exact budget.", "Four budget ranges instead of a slider.", "Faster, and less anxious, to answer."],
                   ["Competitors hide work once it starts.", "A live project timeline with the designer's chat beside it.", "Closes the transparency gap the market research found."],
-                  ["Homzmart can't search by image or code.", "Search by text, voice, image or model code, and filter by material.", "People find a piece the way they remember it."]],
-          media: [["three", ["Style quiz", "Booking flow", "Project tracking and chat"]]] },
-        { k: "solution", h: "Key screens", list: [["Style quiz", "Visual questions, no typing: rooms, colours, furniture, mood. It ends with a style result that shapes what the app shows."], ["Project tracking and chat", "A clear timeline from booking to delivery, and a chat with the designer that takes text, photos and voice."], ["Consultations, two states", "New users see the offer and how to book; returning users go straight to their projects."], ["Shop", "Browse by room, type and style, or search by text, voice, image or code. Product pages show ratings and similar products."], ["Cart and checkout", "Free delivery, discount codes, suggestions, and a checkout with seven payment methods and order tracking."]] },
+                  ["Homzmart can't search by image or code.", "Search by text, voice, image or model code, and filter by material.", "People find a piece the way they remember it."]] },
+        { k: "solution", h: "Prototype: the whole journey in a minute", p: ["The clickable prototype, from the splash and sign-up through the style quiz, booking a consultation and the shop, to checkout. Played at 1.5× speed."],
+          video: { src: "prototype.mp4", poster: "prototype-poster.webp", alt: "Screen recording of the Dhi prototype: splash, onboarding, sign-up, home, the style quiz and its result, booking a consultation, the shop, a product page, the cart and checkout", cap: "The Dhi prototype, end to end, at 1.5× speed", w: 480, h: 1018, g: "phonevid" } },
+        { k: "solution", h: "Home: two doors from the first screen", p: ["Dhi sells two things, design projects and furniture, and most people arrive wanting one of them. The home screen asks which before showing anything else."],
+          phones: [["s-home", "The Dhi home screen: search with camera and microphone, a hero image, two buttons, Book your project and Shop products, a Book your project now banner, the most popular styles, our products with room filters, National Day offers and shop by room", "Home: book a project, or shop", 640, 2860]],
+          notes: [["Two equal doors under the hero", "Book your project and Shop products sit side by side, so the two halves of the business are one tap each from the first screen."], ["The service is sold before the products", "a full-width Book your project now banner comes before the product grid, because a consultation is what competitors don't offer."], ["Styles as a way in", "the most popular styles, modern, classic and boho, lead to the style quiz for people who don't yet know what they want."], ["Seasonal offers get their own band", "the National Day offers sit on a gold band, so they read as an event, not as more products."], ["Shop by room, again", "the page ends with rooms as large chips, the same way the shop is organised."]],
+          take: "The first screen sorts people by intent: a project or a product, with the project offered first." },
+        { k: "solution", h: "Consultations: sell the service before the form", p: ["A design consultation is new for most of Dhi's customers, so a first-time visitor lands on a page that explains the service, prices it and shows how it works before asking for anything. A returning customer skips all of that and lands on their projects."],
+          phones: [["s-consult", "The consultations page for a new user: the headline, Book your consultation, three packages with the most requested one marked, how Dhi works in four steps, the three ways to talk to a designer, past projects and customer reviews", "New user: what it is, what it costs, how it works", 640, 2825], ["s-projects", "Your projects, for a returning user: active and completed counts, each project with its status, progress, next step and date, a Talk to the designer button, and rooms to book next", "Returning user: straight to their projects", 640, 1833]],
+          notes: [["The offer and the price come first", "the headline, From 299 SAR and Book your consultation all sit above the fold, so the cost is never a surprise, which is what Youssef and Khaled asked for."], ["Packages as cards, one recommended", "three packages side by side with the most requested one marked and a money-back line under the title, to answer the weak trust the research found."], ["How it works, with the time per step", "four steps, from choosing a package to receiving the design in 48 hours, each with how long it takes, so the commitment is clear before booking."], ["Three ways to talk, side by side", "chat, voice call and video call get equal space; chat with photos comes first because two of the three personas don't want phone calls."], ["Returning users see their work, not the pitch", "each project card shows its stage, progress, next step and date, with Talk to the designer as the main action."]],
+          take: "One tab, two states: the pitch for people who haven't booked yet, the work itself for people who have." },
+        { k: "solution", h: "Booking: six short questions, no typing", p: ["Booking replaces the phone call where the designer used to ask the same questions. Six steps, one topic each, almost all answered with a tap."],
+          phones: [["s-book-rooms", "Booking step 3 of 6, Which rooms do you want designed: nine room tiles with line icons, from the living room and majlis to the kitchen, office and garden", "Step 3: rooms first", 640, 1292], ["s-book-budget", "Booking step 5 of 6: furniture and decor budget as four ranges in riyals, and when you want it done as three choices", "Step 5: a range, not a number", 640, 1292], ["s-book-details", "Booking step 6 of 6: photos of your room, notes for the designer, and how you want to be contacted: chat, voice call or video", "Step 6: choose how to talk", 640, 1292], ["s-book-done", "Booking confirmed: project number, package, rooms and expected design date, a confirmation sent to the phone, and See your project", "Done: a summary, and the way in", 640, 1292]],
+          notes: [["One question per screen, with a six-step tracker", "customers always know how much is left, and finished steps turn into checks."], ["Tiles with icons instead of text fields", "home type, the condition of the space and the rooms are all a tap, which suits people who book from their phone, between other things."], ["Rooms come before the package", "customers pick the rooms they think in, and the package is suggested from that, so no one has to decode package names."], ["Budget and timing as ranges", "four budget ranges and three timing options are faster and less stressful to answer than an exact figure, and the subtitle makes clear the budget is on top of the package fee."], ["The contact channel is chosen up front", "chat with attachments is listed first, then voice and video, so the designer knows how to reach each customer before the first message."], ["The confirmation repeats the deal", "project number, package, rooms and the expected design date, with See your project leading straight to tracking."]],
+          take: "Six taps replace the first phone call, and the designer starts with everything they would have asked." },
+        { k: "solution", h: "Project tracking: the gap, closed", p: ["The market research found that once work starts, customers can't see it, so they call to ask. This is the screen built for that: every stage, its date, and the designer one tap away."],
+          phones: [["s-tracking", "A living room project: status Design in progress, Premium and Modern tags, 60% progress, and a timeline of stages: booked, request reviewed, design in progress with Talk to the designer, design review and final delivery", "Every stage, its date, and who to talk to", 640, 1292]],
+          notes: [["A timeline, not a status word", "five stages from booking to final delivery; finished ones are checked and dated, the current one is gold, the rest wait in grey."], ["The designer sits inside the current stage", "Talk to the designer appears on the stage that's in progress, where the question comes up."], ["Status and progress in the header", "the stage name, the package and style, and a progress bar are visible before any scrolling."], ["Stages, files and details as tabs", "the timeline is the default; designs and booking details are one tap away, without a longer page."]],
+          take: "The question “where is my project?” now has an answer on screen, so it doesn't need a phone call." },
+        { k: "solution", h: "Shop: browse by room, search the way you remember", p: ["The shop is built around how people describe furniture: by the room it goes in, or by a photo of something they've seen."],
+          phones: [["s-shop", "The shop home: search with camera and microphone, a hero banner, Browse by room with six room chips, a limited-time offer with a countdown, product filters and a product grid with prices and discounts", "Browse by room, offers at the top", 640, 2324], ["s-product", "A product page: photos with a 3D view, name, rating, tags, price with a 20% discount, Tamara and Tabby instalments, Add to cart, delivery times for Riyadh and the rest of the Kingdom, free delivery, in stock, free returns within 14 days, inspect on delivery, colours, description, specification table, rating breakdown and reviews", "Product: payment and delivery before specs", 640, 3401], ["s-search", "Search open: the latest searches above, and a filter sheet for materials, colours, styles and prices, with Apply and Clear all", "Search by text, voice or photo; filter by material", 640, 1292]],
+          notes: [["Search by text, voice or photo", "the camera and microphone sit inside the search bar, filling the gap the competitor analysis found: Homzmart can't search by image or code."], ["Browse by room", "six rooms as chips with a small photo each, because customers think in rooms, not in catalogue categories."], ["Offers at the top", "the limited-time offer and its countdown sit near the top, where Elevenz puts them, instead of mid-page like Homzmart."], ["Filter by material", "materials, colours, styles and prices in one sheet; no competitor filtered by material."], ["Instalments and delivery come before the specs", "on the product page, Tamara and Tabby show the monthly amount and delivery times are split by Riyadh and the rest of the Kingdom, right under the price: the questions people ask before they buy furniture."], ["Inspect before you pay", "a line promises the customer can check the piece on delivery and refuse it at no cost, alongside free returns within 14 days, answering the weak trust the research found."], ["Recent searches first", "the last searches stay above the filters, so coming back to a piece takes one tap."]],
+          take: "People find a piece the way they remember it: the room it belongs in, or a photo of it." },
+        { k: "solution", h: "Cart and checkout: built for how Saudis pay", p: ["Three short steps, address, payment and review, with the total always pinned at the bottom."],
+          phones: [["s-cart", "The cart: a bar showing how much more to add for a 10% discount, two products with colour, price, discount and quantity, In stock and Only 3 left, a discount code field, and the total", "Cart: what's left for a discount, and stock", 640, 1385], ["s-pay", "Checkout, payment step: Mada marked most used, cash on delivery, Apple Pay, Visa or Mastercard and STC Pay, with the total pinned at the bottom", "Payment: Mada first, cash on delivery second", 640, 1385], ["s-order-done", "Order confirmed: a thumbs-up illustration, Thank you, your order is on its way, the order summary, a confirmation sent to the phone, and Track your order", "Done: the summary and tracking", 640, 1385]],
+          notes: [["A progress bar toward the next discount", "“Add 200 SAR to get 10% off” turns the total into a goal instead of a cost."], ["Stock on every item", "In stock or Only 3 left sits on each product, so a customer isn't surprised after paying."], ["Three steps with checks", "address, payment and review are tabs that turn green with a check when done; it's always clear where you are."], ["Local payment first", "Mada, the most used card, is first, then cash on delivery, Apple Pay, cards and STC Pay, matching the personas who pay by card, cash or instalments."], ["The total never scrolls away", "the number of items and the total sit above the main button on every step."]],
+          take: "Checkout speaks the market's language: local cards and wallets first, cash still welcome, and no surprise at the end." },
+        { h: "Dhi in the hand", p: ["The app in the settings it was designed for: a living room, a desk, an afternoon on the sofa."],
+          figs: [{ g: "two", items: [["booking-hand", "Booking step one, home type, on a phone held in someone's hands on a sofa", "Booking, step one: what kind of home?", 1600, 1187], ["home", "The shop home screen on a phone in a marble stand on a desk", "The shop, browse by room", 1600, 1200]] },
+                 { g: "one", items: [["phones", "Three phones in real settings: the style quiz, the style result, and the product list", "The style quiz, its result, and the products it leads to", 1600, 732]] },
+                 { g: "two", items: [["style-mock", "The style result, Your style: luxury contemporary, with styles close to yours, on a phone lying on an olive throw", "The style quiz result", 1400, 1915], ["splash", "The Dhi splash screen with the bilingual logo and a collage of interiors, on a phone against green padded leather", "The splash screen", 1600, 1068]] }] },
         { k: "before", h: "Before and after", p: ["The same customer journey, before the app and with it."],
           ba: [["Where the journey happens", "Showroom, Instagram and calls, each starting from zero", "One app: shop, consult and track"], ["Talking to the company", "Phone calls during working hours", "Chat, voice or video, when it suits the customer"], ["Following the project", "Calling to ask", "A live timeline and a project chat"], ["Finding a piece", "Scrolling until you spot it", "Search by text, voice, image or code"], ["Reaching the company", "Visit the showroom", "From anywhere in Saudi Arabia"], ["The consultation page", "9 sections", "6 sections, 30% shorter"]] },
         { k: "system", h: "Design system", p: ["Warm luxury minimalism with strategic glass: 80% solid, 20% glass. Cairo for Arabic and Poppins for English, with Arabic never below 16px. A 4px spacing unit and radii from 8 to 24 to fully round."],
           swatches: [["#1B4D3E", "Deep teal, primary"], ["#C9A961", "Rich gold, accent"], ["#FAF8F3", "Warm cream, background"], ["#2C2C2C", "Charcoal, text"]],
-          media: [["full", ["Design system"]]] },
+          figs: [{ g: "two", items: [["moodboard", "The Dhi moodboard: olive velvet, walnut wood, brass and afternoon light, with the logo", "The moodboard: olive, walnut, brass and warm light", 1600, 1044], ["billboard", "A green Dhi billboard on a ribbed wall, Details make the difference in Arabic, beside a framed tapestry", "The identity outside the app", 1600, 890]] }] },
 
         /* ------------------------------------------------ 4 · result */
         { k: "measure", h: "How we'd measure success", p: ["Dhi hasn't launched, so these are the measures the design is built to move, starting with the three success metrics set at the start."],
@@ -1691,6 +1781,7 @@
              ["What I did", "I designed four flows end to end. I questioned the step count of the card application, removed an address feature nobody needed, prototyped motion and handed it off to the mobile developer, and designed the Borsa Help Center, which I asked to join and presented to PMs, designers and developers."],
              ["The result", "An application in three steps instead of the four or five first planned, an AI-first support model with clear request states, and a working Lottie animation handed to the mobile developer. Company numbers stay with the company, so no metrics here."]],
       cover: "Fintech super app, UAE and Egypt",
+      coverImg: ["m-cover", "Three Halan screens on phones over a deep green field: the card application consent step, the Borsa support home and the card on its way", 1600, 1000],
       stats: [["4", "flows designed end to end"], ["3", "steps in the card application, from 4–5"], ["3", "support request states"], ["40", "screens and states"]],
       sections: [
         { k: "context", h: "Context", p: ["MNT-Halan runs a fintech super app across the UAE and Egypt. As a product design intern I worked on live products inside their design system: I turned PM requirements into flows, prototyped the moments that needed motion, prepared files for the mobile developers, and presented my work to PMs, designers and developers."],
@@ -1698,6 +1789,7 @@
 
         /* ---------- 1 · Borsa Help Center (lead) */
         { k: "problem", h: "1 · Borsa Help Center: answers first, a person one tap away",
+          figs: [{ g: "one", items: [["m-help", "The Borsa Help Center on three phones: the support home with requests and the assistant, an open answer with deposit methods, and a resolved request", "", 1600, 1000]] }],
           lead: "A new investing app needs support that works at any hour, often for people new to investing. Without a structured way to find answers in the app, every question goes straight to the call center.",
           p: ["While the team was building Halan Borsa, I asked to contribute. I took the PRD for the Help Center and designed the full support experience: how people find answers, ask for help, and follow a request until it's resolved."] },
         { k: "solution", h: "The decisions behind it",
@@ -1718,6 +1810,7 @@
 
         /* ---------- 2 · Getting a Halan Card in the UAE */
         { k: "problem", h: "2 · Applying for a Halan Card, in three steps",
+          figs: [{ g: "one", items: [["m-card", "The card application on three phones: consent with the applicant's details, Emirates ID verification with extracted details, and the card on its way", "", 1600, 1000]] }],
           lead: "The UAE card application lived in a web form. Bringing it into the app meant fitting it on a phone screen, while the PM required the applicant's personal details to stay visible throughout.",
           p: ["The starting plan split the form into four or five steps. I questioned whether each one earned its place, and looked at what could be shortened, simplified or grouped on one screen."] },
         { k: "solution", h: "Grouped by job, not by field",
@@ -1737,7 +1830,7 @@
                     ["Pin first, fields below", "Version 2 starts with a map pin, then shows the address fields filled in.", "chosen", "Quicker for UAE addresses, and the visible fields let people check or fix what the pin found."]] },
         { k: "solution", h: "Every cost before paying, and value while waiting",
           find: [["Screen", "Pin, then confirm", "Search or use the current location on a full map; emirate and area fill in from the pin."],
-                 ["Screen", "Every cost before paying", "The review shows the delivery address, card fee AED 50, delivery AED 5 and the total, charged to the Halan Card balance."],
+                 ["Screen", "Every cost before paying", "The review shows the delivery address, the card fee, the delivery fee and the total, charged to the Halan Card balance."],
                  ["Screen", "A wait that isn't empty", "“Your card is on the way”, 3–5 business days, and straight away: “Spend online right now. Your virtual card is already active.”"]],
           shots: [{ t: "strip", items: [["addr-map", "Pin on the map"], ["addr-filled", "Details filled from the pin"], ["review", "Review: address and fees"], ["success-card", "The card is on its way"]] }] },
 
@@ -1750,9 +1843,9 @@
                    ["Take B, from the prototype", "Each digit lifts and turns green in turn (Smart Animate, ease-out, 0.5 s per box); 3 s later a “Code Verified” toast drops in (ease-out, 0.3 s)."]] },
         { k: "solution", h: "From the physical card to the one on screen",
           p: ["On the success screen I wanted the plastic card and the card on screen to feel like the same object. I explored several motion ideas in Figma, and with the mobile team we picked the one they could build reliably that still made that connection.",
-              "I prepared it for LottieFiles myself. The export hit technical problems; I spent about three hours working through them, then handed a working file to the mobile developer. Handoff turned out to be part of the design."],
-          demo: ["envelope"],
-          motion: [["The card is posted", "Rebuilt live from the prototype's eight keyframes and their exact easing curves: the card slides in, drops into a glass envelope, the flap closes, the envelope tips 22° and flies off."]],
+              "I prepared it for LottieFiles myself. The export hit technical problems; I spent about three hours working through them, then handed a working file to the mobile developer. Handoff turned out to be part of the design.",
+              "The prototype recording shows the three versions of the animation I explored."],
+          video: { g: "phonevid", src: "proto.mp4", poster: "proto-poster.webp", alt: "Screen recording of the prototype, three versions of the card animation one after another: the card slides in, drops into a glass envelope, the envelope closes and flies off, and the card lands on Your card is on the way", w: 432, h: 938 },
           shots: [{ t: "strip", items: [["success-sheet", "Success sheet, before the animation"], ["success-lottie", "Success sheet, with the Lottie"]] }] },
 
         /* ---------- result */
@@ -1776,60 +1869,189 @@
                  ["Say who's speaking", "Label replies from the assistant and from the operations team, and keep the assistant to explaining, never recommending investments."],
                  ["Make Action required actionable", "Put the upload button right in the thread when the team asks for a document."],
                  ["Codes that paste and autofill", "Let the six boxes accept a pasted code and SMS autofill, and design the wrong, expired and resend states."],
-                 ["Show the total earlier", "Bring “AED 55 including delivery” up to the address screen, not only the review."]] }
+                 ["Show the total earlier", "Bring the total, delivery included, up to the address screen, not only the review."]] }
       ] },
-    { id: "nexa", name: "NEXA", cat: "Product", color: "#7FB9D9", behance: "242418511/NEXA-E-Commerce-mobile-app-UIUX-design",
-      tags: ["UI/UX", "E-commerce", "Mobile app"], statement: "A UI/UX design for NEXA, an e-commerce shopping app for mobile: the whole shopping journey, designed for a phone.",
-      meta: [["Project", "NEXA e-commerce app"], ["Platform", "Mobile app"], ["My role", "UI/UX design"], ["Scope", "The shopping journey, from browsing to checkout"]], cover: "E‑commerce mobile app",
+    /* NEXA (Nov 3): rebuilt from her Behance slides. Screens cut out of the slides into f/nexa/s-*.webp;
+       phone numbers on the review screen are blurred. Callout text is rewritten here, not shown as images. */
+    { id: "nexa", name: "NEXA", cat: "Product", color: "#8DB31A", behance: "242418511/NEXA-E-Commerce-mobile-app-UIUX-design",
+      tags: ["UI/UX", "E-commerce", "Mobile app"], statement: "NEXA is a modern e-commerce app for mobile. I designed a calm, minimal shopping experience, inspired by Amazon and Noon, for young adults who want to find something and check out fast.",
+      meta: [["Project", "NEXA e-commerce app"], ["Platform", "Mobile app"], ["My role", "UI/UX design"], ["Tools", "Figma, Photoshop"], ["Audience", "Young adults"], ["Scope", "Home, categories, wishlist, product, cart, checkout, profile"]],
+      tldr: [["The problem", "Big marketplaces offer everything, and their screens show it. Young shoppers who value speed and a clean interface have to dig through noise to get from a product to a paid order."],
+             ["What I did", "Designed the whole journey, from home and categories to the product page and a four-step checkout, around a minimal interface, clear product presentation and quick actions."],
+             ["The result", "A complete mobile shopping app where each screen has one job, and checkout asks only for what's needed, when it's needed."]],
+      reel: [["hero", "NEXA cover: the line Your wardrobe one tap away beside the categories screen, on a lime circle over a giant NEXA wordmark", 1600, 1072], ["hand", "The NEXA home screen on a phone held in a hand, against black", 1600, 1067], ["rock", "The NEXA home screen on a phone standing on a dark rock, with notes on the offers banner and the flash sale", 1600, 1357], ["browse", "Category chips and product cards, the wishlist and the categories grid on phones, and a young man paying by card on his phone", 1600, 982], ["cart-profile", "The cart and the profile screens on two green phones", 1600, 1357], ["palette", "The NEXA palette, lime, near-black and three greys, beside the product page and the Roboto typeface", 1600, 1092]],
+      cover: "E‑commerce mobile app",
+      coverImg: ["hero", "NEXA: the line Your wardrobe one tap away beside the categories screen, on a lime circle over a giant NEXA wordmark", 1600, 1072],
       sections: [
-        { k: "value", h: "The brief", p: ["NEXA is an e-commerce shopping app for mobile. The project covers its UX and UI: how people find products, decide, and buy, on a small screen."] },
-        { k: "problem", h: "The challenge", lead: "On a phone, every extra step between finding a product and paying for it is a reason to leave.", p: ["The work was to keep that path short and clear while still giving shoppers what they need to decide."] },
-        { k: "solution", h: "Approach", p: ["I designed the app around the shopping journey itself, so each screen has one job in getting a shopper from browsing to a finished order."],
-          flow: ["Browse", "Product", "Cart", "Checkout"], flowLbl: "The journey the app covers",
-          media: [["three", ["Browse", "Product", "Checkout"]], ["full", ["Overview"]]] },
-        { k: "impact", h: "Result", p: ["A complete UI/UX design for a mobile shopping app, from the first browse to checkout."] }
+        /* ------------------------------------------------ 1 · problem */
+        { k: "value", h: "The brief", p: ["NEXA is a modern e-commerce app for mobile. The brief was a shopping experience that feels smooth and minimal, with the range people expect from platforms like Amazon and Noon but without their crowded screens."] },
+        { k: "problem", h: "Who it's for", lead: "Young adults who value speed, simplicity and clean design.",
+          p: ["They shop on their phones, often in a few spare minutes. They know what a good shopping app feels like, and they leave when a screen makes them work to find the next step."] },
+        { k: "goals", h: "What the app had to do", goals: ["Let people browse a wide range of products.", "Make search and moving between categories fast.", "Let people save items to a wishlist and share them.", "Keep checkout smooth and payment secure."] },
+        { k: "goals", h: "Design focus", p: ["Four principles held every screen to the same standard."],
+          list: [["Minimal and modern", "Light surfaces, one lime accent and a black navigation bar. Nothing on screen that doesn't help someone shop."], ["Clear product presentation", "Large photos, the price and its discount, the rating, and one button to add to cart."], ["Easy navigation, quick actions", "Five tabs, always in reach, and the main action of each screen one tap away."], ["Mobile first", "Designed for a phone screen from the start, not shrunk from a website."]] },
+        /* ------------------------------------------------ 2 · process */
+        { k: "solution", h: "The journey", p: ["The app is designed around one path, from the first screen to a placed order, with categories and the wishlist as the two ways to find something."],
+          flow: ["Home", "Categories", "Product", "Cart", "Checkout", "Order placed"], flowLbl: "The shopper's path" },
+        /* ------------------------------------------------ 3 · solution */
+        { k: "solution", h: "Home: offers first, then browsing", p: ["The home screen opens with a greeting and the delivery location, then search, then what's on offer today, before the categories and the product grid."],
+          phones: [["s-home-grid", "The lower half of the home screen: Categories with Electronics, Fashion, Grocery and Toys and Games as chips, a grid of product cards with photo, name, rating, colours, price and an add to cart button, and the navigation bar with Home active", "Categories as chips, products as cards", 369, 530]],
+          notes: [["Promotions near the top", "the offers banner sits right under search, where it catches the eye without shouting over everything else."], ["A countdown on the flash sale", "a live timer next to the title helps people catch limited-time deals before they end."], ["Categories as chips", "visual chip cards make switching between Electronics, Fashion or Grocery one tap, for quick browsing."], ["Product cards with just enough", "a clean grid shows the photo, name, rating, colours and price, enough to spark interest without crowding the screen."]],
+          take: "The home screen answers two questions in order: what's on offer today, and where to start browsing." },
+        { k: "solution", h: "Categories and wishlist", p: ["Two other ways in: a categories page for people who know the kind of thing they want, and a wishlist for what they've already found."],
+          phones: [["s-categories", "The categories page: search, then a bento grid of photo tiles in different sizes, Electronics, Fashion, Skin Care, Toys and Games, Perfumes and Video Games, with Categories active in the navigation bar", "Categories as a bento grid", 370, 810], ["s-wishlist", "An empty wishlist: a box illustration, Your wishlist is empty, Add your favourite products to start shopping, a Continue shopping button and Best Sellers for you underneath", "The empty wishlist leads back to shopping", 372, 536]],
+          notes: [["A bento grid of categories", "tiles in different sizes create a visual hierarchy, so browsing feels lively instead of a long list to scan."], ["Photos, not icons", "each tile is a real photo with the category name in lime, so people recognise a category before they read it."], ["Wishlists as artboards", "people can make their own boards and sort saved items into collections: gift ideas, seasonal wants, or different shopping goals."], ["An empty state that keeps going", "an empty wishlist explains what it's for, offers Continue shopping, and shows best sellers right away."]],
+          take: "Categories and the wishlist are two doors into the same shop: one for browsing, one for coming back." },
+        { k: "solution", h: "Product page: everything to decide, nothing more", p: ["The product page puts the decision first, photo, price and rating, and keeps the longer details folded until someone asks for them."],
+          phones: [["s-product", "A product page for Korean skin care products: a photo gallery with wishlist and share, Best Seller and 4.5 stars from 117 reviews, colours, the brand with Shop this brand, 2350 LE with the old price struck through and a coupon, quantity, Description and Brand as folded sections, More for the collection, Reviews and Ratings, Frequent mentions tags and an Add to cart button", "Decide first, details folded", 370, 1324]],
+          notes: [["Expandable sections", "Description and Brand fold away as an accordion. Following Hick's Law, fewer choices on screen at once means less overload, while every detail stays one tap away."], ["Validation through reviews", "real customer reviews and ratings sit on the page; the bandwagon effect does the rest: if others love it, it must be good."], ["Frequent mentions you can tap", "tags pulled from reviews, like Skin care or Lotion, are clickable and search for related products based on what customers actually talk about."], ["Price, discount and coupon in one row", "the new price, the old one struck through and the coupon sit together, so the deal is clear at a glance."], ["Add to cart never scrolls away", "the main button stays pinned at the bottom of the page."]],
+          take: "The page answers “is it good, and is it worth it?” before it asks for anything." },
+        { k: "solution", h: "Checkout: four short steps", p: ["Checkout is split into four steps, delivery info, shipping, payment and review, with a tracker at the top and the total always above the main button."],
+          phones: [["s-signup", "A sign-up sheet over the cart: Hey, create an account to complete your order, Sign in with Google, or first name, last name, email and password, and Create Account", "Sign up only when it's needed", 364, 808], ["s-delivery", "Checkout step one, delivery information: name, address, two phone numbers, state and city, Save delivery details for future orders, and the total with Continue to Payment", "Step 1: delivery information", 366, 803], ["s-shipping", "Checkout, shipping method: Expedited Delivery marked new and free, 2 Day Delivery, 1 Day Saver and 1 Day Delivery, each with its price and timeframe", "Step 2: speed against price", 364, 803], ["s-payment", "Checkout, payment method: digital payment selected with Visa, Mastercard and PayPal, card number, expiry and CVV fields underneath, and cash on delivery", "Step 3: card fields only when needed", 364, 804]],
+          notes: [["Sign up at the right moment", "the account sheet appears only when someone tries to check out without logging in, a strategic moment that balances friction against conversion. Google sign-in makes it one tap."], ["Two tabs for delivery", "Delivery Information and Shipping Method are separate tabs in one view: related details stay together, and nobody gets lost between pages."], ["Every shipping option, priced", "expedited delivery is promoted as new and free, but every tier shows its price and timeframe, so people trade speed against cost without pressure or hidden fees."], ["Progressive disclosure on payment", "card fields only appear when digital payment is chosen, which keeps the first view simple."], ["Save it for next time", "a checkbox keeps delivery details for future orders."]],
+          take: "Each step asks one kind of question, and complexity only shows up when someone chooses it." },
+        { k: "solution", h: "Review and order placed", p: ["The last step shows everything once more, then celebrates the order and points to what's next."],
+          phones: [["s-saved-card", "Payment method with a saved card, Yasser Amin card with only the last digits showing, cash on delivery, and Add new card", "A saved card, recognised", 366, 804], ["s-review", "The review step: payment card, ship to, contact info and the item, each with an Edit link, then the order summary with subtotal, delivery fee and total, and Place Order", "Step 4: one last check", 370, 1013], ["s-done", "Order has been placed, with a check and an illustration of a gift passed between two screens, and two buttons: Continue shopping and Track your order", "Done: celebrate, then next steps", 370, 808]],
+          notes: [["A card people recognise", "a saved card shows the cardholder's name and only its last digits, so it's familiar while the sensitive data stays protected."], ["Alternatives stay close", "cash on delivery and Add new card sit right under the saved card."], ["One last look, with an edit on everything", "payment, address, contact details and items are all on one screen, each with its own Edit link."], ["A success state that celebrates", "Order has been placed comes with an illustration, then two clear ways forward: continue shopping, or track the order."]],
+          take: "The journey ends on a moment of confidence, not a receipt." },
+        { h: "NEXA in the hand", p: ["The home, cart and profile screens, on the phones they were designed for."],
+          figs: [{ g: "two", items: [["hand", "The NEXA home screen on a phone held in a hand, against black", "Home", 1600, 1067], ["cart-profile", "The cart, with two products, a coupon field and the order summary, and the profile, with personal information, address and orders, on two green phones", "Cart and profile", 1600, 1357]] }] },
+        { k: "system", h: "Design system", p: ["One lime accent on near-black and soft greys. Lime marks what to tap next: the main buttons, the active tab, discount tags and the tracker steps that are done. Roboto carries the whole interface."],
+          swatches: [["#B5F601", "Lime · main actions and active states"], ["#18181B", "Near-black · navigation bar and text"], ["#9294A0", "Grey · secondary text"], ["#C9CACF", "Light grey · borders and inactive states"], ["#F1F2F3", "Off-white · page background"]],
+          type: [{ aa: "Aa", name: "Roboto", role: "The whole interface", font: "Roboto, sans-serif", sample: "Flash Sale ends in 02 : 30 : 24" }] },
+        /* ------------------------------------------------ 4 · result */
+        { k: "measure", h: "How we'd measure success", p: ["NEXA hasn't launched, so these are the measures the design is built to move, not results."],
+          measure: [["Checkout completion", "Share of carts that reach Order placed.", "Rising"], ["Sign-up at checkout", "Share of guests who create an account on the checkout sheet instead of leaving.", "Most guests stay"], ["Time to first order", "Usability test with 5–8 young adults: time from opening the app to a placed order.", "One sitting"], ["Wishlist return", "Share of wishlist items later added to cart.", "Rising"], ["Search from reviews", "Taps on Frequent mentions tags that lead to a product view.", "Used regularly"]] },
+        { k: "impact", h: "Result", p: ["A complete UI/UX design for a mobile shopping app."],
+          impact: [["Outcome", "The whole journey is designed, from home, categories and the wishlist to the product page, a four-step checkout and the success state, plus the cart and profile."], ["Outcome", "The account is asked for only at checkout, and card fields only when card payment is chosen."], ["Next", "Usability tests with young adults, starting with the checkout steps."]] }
       ] },
-    { id: "vybe", name: "VYBE", cat: "Product", color: "#6E9FC4", behance: "242417515/VYBE-Events-mobile-app-UI-design",
-      tags: ["UI design", "Events", "Mobile app"], statement: "A UI design for VYBE, a mobile app for finding events and deciding where to go.",
-      meta: [["Project", "VYBE events app"], ["Platform", "Mobile app"], ["My role", "UI design"], ["Scope", "Discovering events, event details, tickets"]], cover: "Events mobile app",
+    /* VYBE (Nov 3): rebuilt from her Behance slides. Phones cut out of the slides into f/vybe/ (m-* are
+       mockup crops with the slide's labels painted out, s-tickets is the flat screen). Slide text rewritten here. */
+    { id: "vybe", name: "VYBE", cat: "Product", color: "#6044FF", behance: "242417515/VYBE-Events-mobile-app-UI-design",
+      tags: ["UI design", "Events", "Mobile app"], statement: "VYBE is a mobile events app. I designed its UI around three things: speed, clarity and effortless booking, so finding what's happening around you takes a glance and a tap.",
+      meta: [["Project", "VYBE events app"], ["Platform", "Mobile app"], ["My role", "UI design"], ["Tools", "Figma, Photoshop"], ["Scope", "Home, search, filters, tickets and RSVPs, profile"]],
+      tldr: [["The problem", "Events are scattered and time-bound. People need to see what's on, near them and soon, then book it, without wading through listings."],
+             ["What I did", "Designed the UI for four tabs, Home, Search, Tickets and Profile, with filters by category, location and date, and tickets that look and feel like tickets."],
+             ["The result", "A complete events app UI where discovering, filtering and keeping track of bookings each take one screen."]],
+      reel: [["hero", "VYBE cover: two phones with the home and search screens in front of a giant white VYBE wordmark on violet", 1600, 900], ["splash", "The VYBE splash screen, the wordmark and two grey stars on violet, with Event app UI screens and the tools, Figma and Photoshop", 1600, 900], ["happening", "Find what's happening around you: the home screen in a hand, the tickets screen, and event categories as pills", 1600, 1880], ["hsf", "The home, search and filter screens on phones, each with its one-line description", 1600, 2552], ["tickets-board", "The tickets screen, flat and on a tilted phone, with Tickets: all your booked events in one place", 1600, 1063], ["palette-board", "The VYBE colours as cards: lime A0FF84, near-black 0B0415, violet 6044FF and white FDFDFD", 1600, 971]],
+      cover: "Events mobile app",
+      coverImg: ["hero", "VYBE: two phones with the home and search screens in front of a giant white VYBE wordmark on violet", 1600, 900],
       sections: [
-        { k: "value", h: "The brief", p: ["VYBE is a mobile app for finding events. The project is its UI: how events are presented so people can browse, choose and go."] },
-        { k: "problem", h: "The challenge", lead: "An events app has to make a plan feel worth it at a glance: what it is, where, when, and how much, before anyone taps.", p: ["The interface had to carry the energy of the events themselves while keeping those practical details easy to find."] },
-        { k: "solution", h: "Approach", p: ["I designed the UI around the moment of choosing, so each screen moves someone from discovering an event to deciding to go."],
-          flow: ["Discover", "Event details", "Tickets"], flowLbl: "The journey the app covers",
-          media: [["three", ["Discover", "Event details", "Tickets"]], ["full", ["Overview"]]] },
-        { k: "impact", h: "Result", p: ["A complete UI design for an events app, from discovery to tickets."] }
+        /* ------------------------------------------------ 1 · problem */
+        { k: "value", h: "The brief", p: ["VYBE is a mobile app for finding events and booking them. The project is its UI: a modern events app that feels as lively as the events themselves while staying quick to use."] },
+        { k: "problem", h: "The challenge", lead: "An events app has to make a plan feel worth it at a glance: what it is, where, when, and how much, before anyone taps.",
+          p: ["Events are also time-bound: a great one next month is useless if it's buried under everything happening today. The interface had to sort by what's near and soon, without losing the energy."] },
+        { k: "goals", h: "Design focus", p: ["Three words set the bar for every screen."],
+          list: [["Speed", "The next event worth going to should be on the first screen, not three taps away."], ["Clarity", "Every card shows the same few facts in the same place: the name, the date and time, the venue."], ["Effortless booking", "Booked events and RSVPs live in their own tab, ready at the door."]] },
+        /* ------------------------------------------------ 2 · process */
+        { k: "solution", h: "The journey", p: ["Four tabs in a dark bar at the bottom: Home to discover, Search to look for something specific, Tickets for what's booked, and Profile."],
+          flow: ["Discover", "Search", "Filter", "Your tickets", "Profile"], flowLbl: "The path through the app" },
+        { k: "solution", h: "Event categories", p: ["Events come in many shapes, so the categories go beyond the usual handful. They show up as pills on search and in the filters."],
+          tiers: [{ h: "What it is", items: [["Arts & Culture", 0], ["Learning", 0], ["Comedy", 0], ["Live Shows", 0], ["Gaming", 0], ["Workshops", 0], ["Wellness", 0], ["Sports", 0], ["Skill Sessions", 0], ["Talks", 0], ["Tech Events", 0], ["Creative Talks", 0], ["Performances", 0], ["Product Launches", 0], ["Festivals", 0]] },
+                  { h: "How it feels", items: [["Night Out", 0], ["Rooftops", 0], ["Social", 0], ["Community", 0], ["Move", 0], ["Runs", 0], ["Cycling", 0], ["Outdoor", 0]] },
+                  { h: "Picked for you", items: [["Near You", 1], ["This Week", 1], ["Trending", 0], ["Editor's Picks", 0], ["Recommended", 0]] }] },
+        /* ------------------------------------------------ 3 · solution */
+        { k: "solution", h: "Home: what's on, at a glance", p: ["Home shows trending and upcoming events the moment the app opens."],
+          phones: [["m-home", "The VYBE home screen: Mark Yatin in Chicago with notifications, Top Events as a large card, Industry Summit, Wednesday April 8th, 19:00, Ukrain Theatre, then Recommended for you as a list of events with a date badge, venue, a heart and a Details button", "Top events first, then picks for you", 545, 1005]],
+          notes: [["One big event on top", "Top Events is a wide photo card with the title in lime, the day, time and venue, so the most important event of the moment can't be missed."], ["Your city in the header", "the greeting carries the location, Chicago, which is what the recommendations are based on."], ["Recommended as a scannable list", "each event is a row with a date badge on the photo, a short description, the venue and a Details button."], ["Save without opening", "a heart on every card saves an event in one tap."]],
+          take: "Home answers “what's worth going to?” before anyone types a thing." },
+        { k: "solution", h: "Search and filters", p: ["Search is for people who know roughly what they want; filters narrow it down by category, place and date."],
+          phones: [["m-search", "The search tab: a search bar with a filter button, Recent Searches as removable chips, Upcoming Near You as photo cards, Categories as pills with Learning selected, and an event card with the date, venue, attendees and 320$ per person", "Search: recent, near you, by category", 445, 1015], ["m-filter", "Filters: Clear all, categories as chips, location as a dropdown set to Alexandria, filter by day, month or year, a calendar for July 2025 with the 13th selected, and Apply", "Filters: category, place, date", 435, 975]],
+          notes: [["Recent searches you can clear", "past searches sit as chips under the bar, each with an × to remove it."], ["Near you before everything else", "Upcoming Near You comes first, as photo cards with the event and venue on the image."], ["Categories as pills", "one tap narrows the list; the selected category turns violet."], ["Price on the card", "the event card shows the price per person and who's going, before the details page."], ["Filters on one sheet", "category, location and date sit on one screen, with Day, Month or Year to set the range, a calendar, Clear all at the top and one Apply button at the bottom."]],
+          take: "From a vague idea to a short list in two screens: search for it, then narrow it." },
+        { k: "solution", h: "Tickets and profile", p: ["All booked events live in one place, and the profile keeps bookings and personal details easy to manage."],
+          phones: [["s-tickets", "Your Tickets as a carousel of ticket-shaped cards, Tech Conference, Wednesday April 8th, Pyramids theatre, then Your RSVPs: Industry Summit, Leadership Forum, Poetry Reading, Craft Market, each with a coloured date block, the venue and a bookmark", "Tickets and RSVPs, in one place", 430, 929], ["m-profile", "The profile: photo and name, Mark Yatin, counts for tracking 52, friends 26 and concerts 12, and a menu: manage tracked artists, find friends, connect an account, manage your location, your tickets", "Profile: bookings and details", 640, 865]],
+          notes: [["Tickets that look like tickets", "booked events are cards with a notch cut in the top and bottom, like a torn ticket, so they read as something you own."], ["RSVPs apart from tickets", "events you've said yes to are a separate list under the tickets, each with its date on a coloured block."], ["Colour per date", "lime, pink, grey and violet blocks make the next few dates easy to tell apart at a glance."], ["Your numbers on the profile", "tracked artists, friends and concerts sit under the photo."], ["Everything personal in one menu", "tracked artists, friends, connected accounts, location and tickets are each one row."]],
+          take: "Once booked, an event is always one tap away, in a form that looks like what it is." },
+        { k: "system", h: "Design system", p: ["Electric violet with a lime spark, on near-black and white. Violet marks what's active: the selected tab, chip and date, and the main buttons. Lime is saved for event titles on photos. Roboto in three weights, Regular, Medium and Bold, carries the whole interface."],
+          swatches: [["#6044FF", "Violet · active states and buttons"], ["#A0FF84", "Lime · event titles and highlights"], ["#0B0415", "Near-black · navigation bar and text"], ["#FDFDFD", "White · screens and cards"]],
+          type: [{ aa: "Aa", name: "Roboto", role: "Regular, Medium and Bold", font: "Roboto, sans-serif", sample: "Industry Summit · Wednesday, April 8th · 19:00" }],
+          figs: [{ g: "one", items: [["splash", "The VYBE splash screen, the wordmark and two grey stars on violet", "The splash screen", 1600, 900]] }] },
+        /* ------------------------------------------------ 4 · result */
+        { k: "measure", h: "How we'd measure success", p: ["VYBE hasn't launched, so these are the measures the design is built to move, not results."],
+          measure: [["Time to a plan", "Usability test with 5–8 people: time from opening the app to saving or booking an event.", "Under a minute"], ["Filter use", "Share of searches narrowed with category, location or date.", "Used often"], ["Bookings from home", "Share of bookings that start from Top Events or Recommended.", "Rising"], ["Return to tickets", "How often people open Tickets before an event instead of searching for it again.", "Most of them"]] },
+        { k: "impact", h: "Result", p: ["A complete UI design for a mobile events app."],
+          impact: [["Outcome", "Home, search, filters, tickets with RSVPs and the profile are designed as one system, on one violet and lime palette."], ["Next", "Design the event page and the booking steps, then test the whole path with people who go out often."]] }
       ] },
-    { id: "lumiere", name: "Lumiere", cat: "Product", color: "#A9C7DA", behance: "243721917/Lumiere-landing-page-Graduation-2025",
-      tags: ["Web UI", "Landing page", "Graduation project"], statement: "A landing page for “Lumière · Hark the unseen”, a cultural campaign and my 2025 graduation project, built to carry visitors from a story to an event and a ticket.",
-      meta: [["Project", "Lumière, graduation project 2025"], ["Platform", "Website, campaign landing page"], ["My role", "UX and UI design"], ["Timeline", "May – June 2025"], ["Focus", "Storytelling, interactive exploration, event and ticket discovery"]], cover: "Landing page, graduation 2025",
-      tldr: [["The problem", "A campaign page has to tell a story and still lead somewhere. Visitors arrive curious about a culture, not ready to buy a ticket."], ["What I did", "Designed the page as one path: cultural storytelling first, interactive region-based exploration in the middle, events and ticket discovery at the end."], ["The result", "A landing page where the campaign's narrative and its practical goal, getting people to the events, work as one flow."]],
+    /* Lumiere (Nov 3): rebuilt from her web presentation, full-page screenshots and prototype recording.
+       Sections cut from the page into f/lumiere/; the contact phone number is blurred and the video ends before it. */
+    { id: "lumiere", name: "Lumiere", cat: "Product", color: "#8D1D19", behance: "243721917/Lumiere-landing-page-Graduation-2025",
+      tags: ["Web UI", "Landing page", "Graduation project"], statement: "Lumière is a French cultural campaign that shows the unseen side of France: real stories, hidden places, authentic moments. I designed its landing page, my 2025 graduation project, to carry visitors from that story to the events and the regions behind it.",
+      meta: [["Project", "Lumière, graduation project 2025"], ["Platform", "Website, campaign landing page"], ["My role", "UX and UI design"], ["Timeline", "May – June 2025"], ["Focus", "Storytelling, themes, events, an interactive map"]],
+      tldr: [["The problem", "A campaign page has to tell a story and still lead somewhere. Visitors arrive curious about a culture, not ready to plan a visit."],
+             ["What I did", "Designed one scrolling page: a postcard hero, the campaign's story, French culture by theme in tabs, an events carousel, an interactive map of the regions, and contact."],
+             ["The result", "A landing page and clickable prototype where the campaign's mood and its practical goal, getting people to events and places, work as one path."]],
+      reel: [["cover", "The Lumière landing page on a large screen and a small one, deep red with gold, over a pixelated painting of rooftops", 1600, 989], ["hero", "The hero: ESTD 2025, Spark The Unseen in gold over three Paris polaroids", 1393, 992], ["about", "Whose Lumiere? The campaign's story beside a photo of the Seine at golden hour", 1179, 780], ["tabs", "Theme tabs, Fashion, Cinema, Food: French Fashion, Timeless Elegance, with a photo near the Eiffel Tower", 1179, 836], ["events", "What to do in Paris: event cards with photo, date, place and More info, with arrows", 1393, 991], ["map", "The map: France by region in gold, beside Discover every place in France", 1179, 760]],
+      cover: "Landing page, graduation 2025",
+      coverImg: ["cover", "The Lumière landing page on a large screen and a small one, deep red with gold, over a pixelated painting of rooftops", 1600, 989],
       sections: [
-        { k: "value", h: "The brief", p: ["Lumière, “Hark the unseen”, is the cultural campaign of my 2025 graduation project in Applied Arts. Its poster series introduces French culture, from its cuisine onward. The landing page is where the campaign lives online, and where curiosity has to turn into a visit."] },
-        { k: "problem", h: "The challenge", lead: "A campaign page has to tell a story and still lead somewhere: from curiosity about a culture to an event and a ticket.", p: ["Story-led pages tend to stop at the story, and event pages tend to start at the price list. The page needed both, in the right order."] },
-        { k: "goals", h: "Goals", goals: ["Carry the campaign's narrative, so the page feels like part of Lumière and not a ticket form.", "Let visitors explore at their own pace, region by region, instead of reading one long page.", "Lead naturally from the story to the events and to ticket discovery."] },
-        { k: "solution", h: "Approach", p: ["I designed the page as a single path, using user-centered design to decide what each step has to give the visitor before asking anything of them."],
-          flow: ["Cultural story", "Explore by region", "Events", "Tickets"], flowLbl: "The visitor's path",
-          list: [["Storytelling first", "The page opens on the campaign's cultural story, so visitors meet Lumière before any call to action."], ["Interactive, region-based exploration", "Visitors choose a region and explore what belongs to it, which turns a long read into something they steer."], ["From story to tickets", "Events and ticket discovery come after the story, as the natural next step rather than an interruption."]],
-          media: [["full", ["Landing page, full length"]], ["two", ["Region explorer", "Events and tickets"]]] },
-        { k: "impact", h: "Result", p: ["Lumière was delivered as my graduation project in 2025. It is a design project, so these are design outcomes rather than live numbers."],
-          impact: [["Outcome", "One UX flow that carries visitors from cultural storytelling to events and ticket discovery."], ["Outcome", "Interactive, region-based exploration that supports the campaign narrative and keeps visitors engaged."], ["Next", "Test the region explorer with visitors: how many reach an event page, and how long it takes them."]] },
-        { k: "learn", h: "What I learned", p: ["A campaign page is a story with a destination. Deciding where the story ends and the action begins mattered more than any single screen."] }
+        /* ------------------------------------------------ 1 · problem */
+        { k: "value", h: "The brief", p: ["Lumière is a French campaign that reveals the unseen side of France. Away from clichés, it spotlights real stories, hidden places and authentic moments: a journey into the heart of the country. The landing page is where the campaign lives online, my graduation project in 2025."] },
+        { k: "problem", h: "The challenge", lead: "A campaign page has to tell a story and still lead somewhere: from curiosity about a culture to an event and a place to go.",
+          p: ["Story-led pages tend to stop at the story, and event pages start at the listings. Lumière needed both, in the right order, and in a voice that feels raw, quiet and deeply human rather than like a travel brochure."] },
+        { k: "goals", h: "Goals", goals: ["Carry the campaign's mood, so the page feels like part of Lumière, not a ticket form.", "Let visitors explore France at their own pace: by theme, then by region.", "Lead from the story to what's happening, and to a way to get in touch."] },
+        /* ------------------------------------------------ 2 · process */
+        { k: "solution", h: "The page, top to bottom", p: ["One scrolling page in six parts, each a step from feeling to doing. A sticky bar with Home, About, Events, Contact and Map and a Reach Out button keeps every part one click away."],
+          flow: ["Spark the unseen", "Whose Lumière?", "France by theme", "What to do in Paris", "Map", "Contact"], flowLbl: "The visitor's path" },
+        /* ------------------------------------------------ 3 · solution */
+        { k: "solution", h: "Hero: France as a stack of postcards", p: ["The page opens on the campaign line, not on a menu of offers."],
+          screen: ["hero", "The hero: a gold star, ESTD and 2025 either side of SPARK, The Unseen in script, and three polaroids of Paris, a bridge at sunset with the Eiffel Tower, the Arc de Triomphe and a flowered street", 1393, 992],
+          notes: [["The campaign line is the headline", "SPARK in tall gold capitals, The Unseen in a script laid over it, with ESTD and 2025 either side like a stamp."], ["Polaroids instead of a banner", "three tilted instant photos, a sunset bridge, the Arc de Triomphe and a quiet flowered street, set the tone: personal, found, a little nostalgic."], ["Red and gold, like old French print", "a deep red page and gold type feel like a theatre programme or a vintage label."], ["Reach Out stays in the corner", "the one call to action is always there, but never louder than the story."]],
+          take: "The first screen sells a feeling, not a product." },
+        { k: "solution", h: "Whose Lumière? The story, in a few lines", p: ["Right after the hero, the page says what Lumière is, in plain words."],
+          screen: ["about", "Whose LUMIERE? in gold, a paragraph about the campaign, and the line Raw, quiet and deeply human, beside a photo of the Seine at golden hour in a gold-edged frame", 1179, 780],
+          notes: [["A question as the title", "Whose Lumière? invites the visitor in instead of announcing a brand."], ["The promise, then the mood", "the paragraph says what the campaign does; a quieter line under it says how it feels: raw, quiet and deeply human."], ["One photo, golden hour", "the Seine at sunset in a frame with a thin gold edge, the same warm light as the hero."]],
+          take: "Visitors know what Lumière is, and how it should feel, before they scroll further." },
+        { k: "solution", h: "France by theme, in tabs", p: ["Culture comes in tabs: Fashion, Cinema, Food and more. Each tab is a short story with its own photo, and its own colour."],
+          screen: ["tabs", "Folder tabs, Fashion, Cinema, Food and a fourth cut off, over a panel: French Fashion, Timeless Elegance, a paragraph about Paris as the fashion capital, and a photo of a woman in a red gown near the Eiffel Tower", 1179, 836],
+          notes: [["Folder tabs, not a menu", "the themes sit on tabs like a file folder; the active one joins the panel, so it's clear which story is open."], ["A colour per theme", "Fashion is red, Cinema navy, Food blue: switching tabs changes the whole panel, so each theme feels like its own chapter."], ["Title, script, then the story", "a capital headline and a script subtitle, French Fashion: Timeless Elegance, then one paragraph and one strong photo."], ["Cinema ties back to the name", "the Cinema tab tells how France gave birth to cinema with the Lumière brothers' first film in 1895."], ["More tabs past the edge", "a fourth tab cut off at the edge shows there's more to explore."]],
+          take: "France is told one theme at a time, so a long story never feels like a long read." },
+        { k: "solution", h: "What to do in Paris", p: ["From story to plans: the events of the season, as a carousel of cards."],
+          screen: ["events", "What to do in Paris, a line about the exclusive events of the anniversary, then a carousel of cards: Grand Palais reopening with a photo of the gilded hall, the date, the place and More info, and a garden festival at a château, with arrow buttons below", 1393, 991],
+          notes: [["Cards that look like tickets", "each event is a photo and a card joined by a dashed line, like a ticket and its stub."], ["The facts in one row", "place and date sit under the title with small icons, so cards can be compared at a glance."], ["One button per card", "More info in the page's red, the only filled button on the card."], ["A carousel with arrows", "cards run past the edge of the page, and two round arrows step through them."]],
+          take: "The story turns into plans without changing its voice." },
+        { k: "solution", h: "The map: discover every region", p: ["An introductory, interactive map of France: hover a region and its name and a photo appear."],
+          screen: ["map", "A gold map of France split into its regions, with Corsica, beside the word Map in script and Discover every place in France with our introductory interactive map", 1179, 760],
+          notes: [["The whole country, region by region", "France is drawn in gold with every region outlined, so the campaign's reach beyond Paris is visible at once."], ["Hover to discover", "pointing at a region shows its name in a small gold label and a photo of a place there."], ["Exploring, not searching", "the map invites wandering, the way the campaign wants people to see France."]],
+          take: "The map turns “the unseen side of France” into places you can point at." },
+        { k: "solution", h: "Contact and footer", p: ["The page ends on an invitation to talk, in the campaign's gold."],
+          screen: ["contact", "Contact in script, Have a question? Let's discuss your vision and bring it to life, the email address, and a red form with name, email and message fields and Send Message, above a gold footer with the logo and social links", 1179, 711],
+          notes: [["The colours flip at the end", "a gold section with a red form marks the change from reading to writing."], ["Three fields only", "name, email and message, and one Send Message button."], ["Direct details beside the form", "for anyone who'd rather write themselves."]],
+          take: "The last step is a conversation, not a sign-up." },
+        { k: "solution", h: "Prototype", p: ["The clickable prototype, from the hero through the theme tabs, the events carousel and the map hover."],
+          video: { src: "walk.mp4", poster: "walk-poster.webp", alt: "Screen recording of the Lumière prototype: the hero, Whose Lumière?, the Fashion, Cinema and Food tabs changing colour, the events carousel moving with its arrows, and the map showing region names and photos on hover", w: 1440, h: 822 } },
+        { k: "system", h: "Design system", p: ["A deep French red with gold, like an old theatre programme, and the cream of an instant photo. Each theme tab brings its own colour. Type pairs a tall, condensed display serif for capitals, a formal script for the second line of each title, and a plain sans for reading."],
+          swatches: [["#8D1D19", "French red · the page"], ["#F5C360", "Gold · titles, buttons, the map"], ["#E8C99D", "Polaroid cream · photo frames"], ["#A13D26", "Brick · the events band"], ["#272253", "Navy · the Cinema tab"], ["#3C7EA5", "Blue · the Food tab"]] },
+        /* ------------------------------------------------ 4 · result */
+        { k: "measure", h: "How we'd measure success", p: ["Lumière was a graduation project and hasn't launched, so these are the measures the page is built to move, not results."],
+          measure: [["Reaching the events", "Share of visitors who scroll from the story down to What to do in Paris.", "Most visitors"], ["Theme tabs opened", "Average number of tabs opened per visit.", "More than one"], ["Map exploration", "Share of visitors who hover or tap at least one region.", "Rising"], ["From events to contact", "Clicks on More info and messages sent through the form.", "Rising"]] },
+        { k: "impact", h: "Result", p: ["Lumière was delivered as my graduation project in 2025."],
+          impact: [["Outcome", "One page that carries visitors from the campaign's story to themes, events, regions and contact."], ["Outcome", "A clickable prototype with theme tabs that change colour, an events carousel and a hover map."], ["Next", "Region pages behind the map, and the mobile layout tested with real visitors."]] },
+        { k: "learn", h: "What I learned", p: ["A campaign page is a story with a destination. Deciding where the story ends and the plans begin mattered more than any single section."] }
       ] },
     { id: "gd-2024", name: "Graphic Design Portfolio 2024", cat: "Graphic", color: "#B9B39A", behance: "250574963/Graphic-Design-Portfolio-2024",
-      tags: ["Graphic design", "Collection"], statement: "A collection of my graphic design work from 2024.",
+      tags: ["Graphic design", "Collection"], statement: "A collection of my graphic design work from 2024: posters, social media, print, illustration and branding.",
       meta: [["Project", "Graphic design portfolio"], ["Year", "2024"]], cover: "Selected graphic work",
-      sections: [{ h: "Selected work", media: [["two", ["Work", "Work"]], ["three", ["Work", "Work", "Work"]], ["full", ["Work"]]] }] },
+      sections: [{ h: "Selected work", p: ["Posters, social media, print and packaging, illustration and branding, from 2024."], figs: [{ g: "one", items: [["jazz", "Three Jazz Festival posters mixing stock photos of musicians with bright hand-drawn shapes and clouds", "Posters: Jazz Festival", 1600, 1131]] }, { g: "one", items: [["amazigh", "Three Amazigh culture posters, Azul Felawn, with halftone portraits, Amazigh symbols and bilingual type", "Posters: Amazigh culture", 1600, 1131]] }, { g: "one", items: [["amazigh-street", "The Amazigh posters pasted on old Cairo walls, beside street signs, a motorcycle and a man sitting outside a shop", "Posters: Amazigh culture, in the street", 1600, 1131]] }, { g: "one", items: [["kilo-kabab", "Kilo Kabab social media posts around an Instagram phone mock-up, green and yellow with Arabic headlines", "Social media: Kilo Kabab", 1600, 1131]] }, { g: "one", items: [["breadfast", "Breadfast social media posts in magenta and light blue: croissants, salad, cake and coffee with Arabic headlines", "Social media: Breadfast", 1600, 1131]] }, { g: "one", items: [["emdad", "Emdad company profile 2023: cover, spreads with staff table, quality policy and organisation chart", "Print: Emdad company profile, Saudi Arabia", 1600, 1131]] }, { g: "one", items: [["print-real-life", "Printed books, booklets, posters and packaging on a table at an exhibition, and Rofaida presenting her work", "Print and packaging, in real life", 1600, 1131]] }, { g: "one", items: [["red-bull", "Red Bull ad: a winged character poster, pencil character sketches, model sheets and storyboard pages", "Illustration: Red Bull ad storyboard", 1600, 1131]] }, { g: "one", items: [["eid", "Eid al-Fitr illustration: hands shaping kahk cookies and a cat's paws, in an Islamic frame, shown as a coaster", "Illustration: Eid al-Fitr", 1600, 1131]] }, { g: "one", items: [["ghorya", "Mogamaa El-Ghorya sign system: calligraphic logo, booklet, pictograms for the rooms and directional signs", "Branding: Mogamaa El-Ghorya sign system", 1600, 1131]] }, { g: "one", items: [["personal-branding", "Personal branding: an R and A monogram with sparkles, business cards, badges, pattern, tote bags and a notebook", "Branding: personal identity", 1600, 1131]] }] }] },
     { id: "social-posts", name: "Breadfast and Kilo Kabab campaign", cat: "Playground", color: "#9CC488", behance: "194862413/Socia-media-post-designs-V1",
       tags: ["Social media", "Campaign"], statement: "Social media campaign designs for Breadfast and Kilo Kabab.",
+      reel: [["bf-grid", "Breadfast posts in a grid with an Instagram phone mockup: Fresh organic, a baby croissant, a cake, coffee, Nutella croissant and lunch boxes", 800, 801], ["kk-feast", "Kilo Kabab post: kebab, kofta, chicken and rice on a wooden table, Having guests? Leave it to us", 800, 800], ["bf-baby", "Breadfast post: baby croissants falling across bold white lettering on magenta, with a New product sticker", 800, 800], ["kk-moments", "Kilo Kabab post: kofta on a board on the sand beside a straw hat and a camera, Sweet moments with Kilo Kabab", 800, 800], ["bf-banner", "Breadfast banner: a tray of croissants beside fresh eggs, Try a different breakfast?", 1605, 800], ["kk-mix", "Kilo Kabab post: a mixed grill plate on a checked cloth, with steam in the shape of a heart", 800, 800], ["bf-try", "Breadfast post: croissants and eggs with hand-drawn circles and arrows, Try fresh croissants and fresh eggs", 800, 800], ["kk-wraps", "Kilo Kabab post: two hands holding shish and fillet wraps in branded boxes on orange", 800, 800], ["bf-cake", "Breadfast post: a bundt cake with its ingredients, flour, eggs, butter and milk, labelled in handwriting, Let's bake a cake", 800, 800], ["kk-lentil", "Kilo Kabab post: a cup of lentil soup steaming on a tray, with a sticky note", 800, 800], ["bf-nutella", "Breadfast post: chocolate pouring onto a croissant on magenta, Tried the new Nutella croissant?", 800, 800], ["kk-holiday", "Kilo Kabab post: kofta in a basket on a line-drawn delivery scooter in the city, The holiday is flying by", 800, 800]],
       meta: [["Project", "Breadfast and Kilo Kabab campaign"], ["Discipline", "Social media campaign"]], cover: "Campaign posts",
       sections: [{ h: "Posts", media: [["three", ["Post", "Post", "Post"]], ["three", ["Post", "Post", "Post"]]] }] },
+    /* Snapchat Spellbook (Nov 5): her illustration + UI redesign concept; "View project" opens its own page (a claude.ai artifact) */
+    { id: "snapchat", name: "Snapchat Spellbook", cat: "Playground", color: "#544AE6", link: "https://claude.ai/artifact/HAaLmcqoCzXzVsSXqmrkD6",
+      tags: ["Illustration", "UI redesign"], statement: "Snapchat’s logo is a ghost, so I asked: what if that ghost went to magic school? Snapchat Spellbook reimagines the app’s icons as enchanted objects: a key for location, a mirror for the camera, a message in a bottle for chat. These sit inside a cleaner interface built for the people who use it most. It’s a concept project made for fun, exploring how a pictogram system can give a familiar app a brand-new personality.",
+      reel: [["screens", "The redesigned screens: camera, map, Discover, Stories, chats and Add friends, in lavender with the new pictograms", 1333, 800], ["pictograms", "21 magical pictograms on lime: key, eye, bottle, wand, mirror, tarot cards, ghost, hourglass, torch and more", 1231, 800], ["before-after", "Before and after: Snapchat's black-and-white icons beside the new violet and lime pictograms", 1454, 800], ["object-to-pictogram", "Real object plus a spell equals a pictogram: a key for Location, an evil eye for Discover, a bottle for Chat, a mirror for Camera", 1231, 800], ["camera", "The camera screen before and after, with patch notes: Camera, recast, and Four tabs", 1092, 800], ["inspiration", "Each feature as an enchanted object, with its story: Location, Discover, Chat, Camera, Multi snaps, Notifications and more", 1014, 800], ["old-icons", "Game over for black and white: the original icons, with 2 colours, 5 nav items and 0 ghost links", 1373, 800], ["audience", "Built for the people who snap the most: the audience, aged 13 to 27, what they love and what they hate", 1294, 800]],
+      meta: [["Project", "Snapchat Spellbook"], ["Discipline", "Illustration and UI redesign"]], cover: "Pictograms and UI redesign",
+      sections: [{ h: "Concept", media: [["full", ["Overview"]]] }] },
     { id: "traubi", name: "Traubi", cat: "Playground", color: "#B7A3CF", behance: "250717001/Traubi-SocialMedia-Campaign",
       tags: ["Social media", "Campaign"], statement: "A social media campaign for Traubi.",
+      reel: [["t-pure", "Traubi post: a frosted bottle among purple grapes and splashes, with the line Pure raisin drink in Arabic", 864, 1080], ["t-adventure", "Traubi post: two bottles in a mountain lake under a cable car and a waterfall, Live a refreshing adventure", 864, 1080], ["t-anywhere", "Traubi post: a giant bottle beside a tower over a city at dusk, grapes floating down on parachutes, Any time, anywhere", 864, 1080], ["t-vine", "Traubi post: the bottle covered in purple grapes and vine leaves in a vineyard", 864, 1080], ["t-happy", "Traubi post: a bottle and a glass on a garden table, with playful lettering wishing a happy holiday", 864, 1080], ["t-heart", "Traubi post: a small bottle inside a heart made of grapes on moss, The first and the last love", 864, 1080]],
       meta: [["Project", "Traubi"], ["Discipline", "Social media campaign"]], cover: "Social media campaign",
       sections: [{ h: "Campaign", media: [["three", ["Post", "Post", "Post"]], ["full", ["Campaign overview"]]] }] },
     { id: "dalya", name: "Dalya", cat: "Playground", color: "#E0A9B6", behance: "250732059/Dalya-SocialMedia-Campaign",
       tags: ["Social media", "Campaign"], statement: "A social media campaign for Dalya.",
+      reel: [["d-lemon", "Dalya post: a hand holding a green Fayrouza lemon soda over a pile of lemons", 864, 1080], ["d-movie", "Dalya post: popcorn, Fayrouza soda and a laptop on a yellow table for a movie night", 864, 1080], ["d-cartoon", "Dalya post: a ketchup crisps bag flying through a cartoon chase, Childhood memories with Dalya flavours", 864, 1080], ["d-stix", "Dalya post: Stix cheese snack sticks built into a maze on a green hill, The taste of fun", 864, 1080], ["d-otherworld", "Dalya post: a French cheese crisps bag in an enchanted forest with tiny witches and a cheese house, From another world", 864, 1080], ["d-top", "Dalya post: Top Dalya pineapple, mango and peach cans on a picnic blanket", 864, 1080], ["d-pufak", "Dalya post: Pufak peanut puffs bursting from the bag in a village of peanut houses, Rich crunchy peanut flavour", 864, 1080], ["d-pizza", "Dalya post: a boat with a pizza-slice sail and pizza crisps bags floating in the sea, A magical flavour", 864, 1080]],
       meta: [["Project", "Dalya"], ["Discipline", "Social media campaign"]], cover: "Social media campaign",
       sections: [{ h: "Campaign", media: [["three", ["Post", "Post", "Post"]], ["full", ["Campaign overview"]]] }] }
   ];
@@ -1846,7 +2068,8 @@
       (sec.media || []).forEach(function (m) { m[1].forEach(function (l) { if (labels.indexOf(l) < 0 && !/^(Screen|Post|Work|Detail|Application)$/.test(l)) labels.push(l); }); });
     });
     if (c.coverImg) imgs.unshift(["f/" + c.id + "/" + c.coverImg[0] + ".webp", c.coverImg[1], c.coverImg[2], c.coverImg[3]]);
-    return { imgs: imgs, labels: labels, tags: c.tags, color: c.color, behance: c.behance ? BE + c.behance : "" };
+    if (c.reel) imgs = c.reel.map(function (it) { return ["f/" + c.id + "/" + it[0] + ".webp", it[1], it[2], it[3]]; });
+    return { imgs: imgs, labels: labels, tags: c.tags, color: c.color, behance: c.link || (c.behance ? BE + c.behance : "") };   /* link: a project page outside Behance */
   };
 
   function esc(t) { return String(t).replace(/[&<>"]/g, function (ch) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]; }); }
@@ -1868,7 +2091,7 @@
   /* real screens in a phone frame (Halan, Oct 25) */
   var SHOT = "f/halan/";
   function phone(src, cap) {
-    return '<figure class="cs-phone"><span class="pf"><img src="' + SHOT + src + '.webp" alt="' + esc(cap || src.replace(/-/g, " ")) + '" decoding="async"></span>' + (cap ? "<figcaption>" + esc(cap) + "</figcaption>" : "") + "</figure>";
+    return '<figure class="cs-phone"><span class="pf"><img src="' + SHOT + src + '.webp" alt="' + esc(cap || src.replace(/-/g, " ")) + '" decoding="async"></span></figure>';   /* no captions under pictures (Doha, Nov 2) */
   }
   function shots(g) {
     if (g.t === "anim") return '<figure class="cs-phone cs-anim" data-anim="1"><span class="pf">' + g.items.map(function (it, i) {
@@ -1951,7 +2174,7 @@
   function fig1(it, id, cls) {
     var img = '<img src="f/' + id + "/" + it[0] + '.webp" alt="' + esc(it[1]) + '"' + (it[3] ? ' width="' + it[3] + '" height="' + it[4] + '"' : "") + ' decoding="async" loading="lazy"' + (it[3] && it[3] < 700 ? ' style="max-width:' + it[3] + 'px"' : "") + ">";
     return '<figure class="cs-fig' + (cls ? " " + cls : "") + '">' + (cls === "phone" ? '<div class="ph-scroll" tabindex="0" aria-label="' + esc(it[2] || it[1]) + ', scrolls">' + img + "</div>" : img) +
-      (it[2] ? "<figcaption>" + esc(it[2]) + "</figcaption>" : "") + "</figure>";
+      "</figure>";
   }
   function figs(g, id) {
     /* pair (Sadeem, Oct 28): the big screens stacked on the left, the phone beside them; a phone taller than its row scrolls inside its frame */
@@ -1963,7 +2186,7 @@
     /* WebM first (plays in every browser, incl. builds without H.264), MP4 as the fallback */
     var base = "f/" + id + "/" + v.src.replace(/\.mp4$/, "");
     return '<div class="cs-figs ' + (v.g || "one") + '"><figure class="cs-fig cs-vid"><video poster="f/' + id + "/" + v.poster + '" muted loop playsinline preload="metadata"' + (reduced ? "" : " autoplay") +
-      ' aria-label="' + esc(v.alt) + '"' + (v.w ? ' width="' + v.w + '" height="' + v.h + '"' : "") + '><source src="' + base + '.webm" type="video/webm"><source src="' + base + '.mp4" type="video/mp4"></video>' + (v.cap ? "<figcaption>" + esc(v.cap) + "</figcaption>" : "") + "</figure></div>";
+      ' aria-label="' + esc(v.alt) + '"' + (v.w ? ' width="' + v.w + '" height="' + v.h + '"' : "") + '><source src="' + base + '.webm" type="video/webm"><source src="' + base + '.mp4" type="video/mp4"></video>' + (v.cap ? "<figcaption>" + esc(v.cap) + "</figcaption>" : "") + "</figure></div>";   /* video captions stay (Doha) */
   }
   /* a comparison table: ✓ / ✗ cells read aloud as yes / no */
   function tableHTML(t) {
@@ -1991,6 +2214,17 @@
     h += '<div class="ia-tabs">' + ia.tabs.map(function (t, i) {
       var body = t.items ? iaItems(t.items) : t.groups.map(function (g) { return '<div class="ia-grp"><p>' + esc(g.h) + "</p>" + iaItems(g.items) + "</div>"; }).join("");
       return '<section class="ia-tab"><h4><i>' + (i + 1) + "</i>" + esc(t.h) + "</h4>" + body + "</section>"; }).join("") + "</div></div>";
+    return h;
+  }
+  /* phone screens in a row, then the decisions behind them and a takeaway (Dhi, Nov 2).
+     phones: [file, alt, caption, w, h]; a screen taller than a phone scrolls inside its frame */
+  function phonesHTML(s, id) {
+    var h = '<div class="cs-phones n' + s.phones.length + '">' + s.phones.map(function (p, i) {
+      var tall = p[4] / p[3] > 2.3, img = '<img src="f/' + id + "/" + p[0] + '.webp" alt="' + esc(p[1]) + '" width="' + p[3] + '" height="' + p[4] + '" decoding="async" loading="lazy">';
+      return '<figure class="cs-phone' + (tall ? " tall" : "") + '">' + (tall ? '<div class="ph-frame" tabindex="0" aria-label="' + esc(p[2]) + ', scrolls">' + img + '</div><span class="ph-hint" aria-hidden="true">Scroll</span>' : img) +
+        "</figure>"; }).join("") + "</div>";
+    if (s.notes) h += '<div class="cs-phnotes"><p class="sc-lbl">' + s.notes.length + ' design decisions</p><ol class="sc-notes">' + s.notes.map(function (n) { return "<li><b>" + esc(n[0]) + "</b><span>" + esc(n[1]) + "</span></li>"; }).join("") + "</ol>" +
+      (s.take ? '<p class="sc-take"><small>Takeaway</small>' + esc(s.take) + "</p>" : "") + "</div>";
     return h;
   }
   /* a clean product screen with the decisions behind it, numbered, and the takeaway (Maaliy, Oct 28):
@@ -2054,7 +2288,9 @@
     }, 850);
   }
   function render(c) {
+    /* "Next up" walks only projects with a page on this site; Graphics projects open on Behance instead */
     var n = CASES[(c.i + 1) % CASES.length], num = ("00" + (c.i + 1)).slice(-3);
+    for (var k = 1; k < CASES.length && n.cat !== "Product"; k++) n = CASES[(c.i + 1 + k) % CASES.length];
     var h = '<div class="cs-in" style="--ph:' + c.color + '">';
     h += '<div class="cs-bar"><button class="glass-btn cs-back" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Back to all works</button>' +
          '<span class="cs-crumb">' + num + " &middot; " + esc(c.cat) + "</span></div>";
@@ -2120,7 +2356,8 @@
       (s.shots || []).forEach(function (g) { h += shots(g); });
       if (s.video) h += video(s.video, c.id);
       (s.figs || []).forEach(function (g) { h += figs(g, c.id); });
-      if (s.screen || s.take) h += screenHTML(s, c.id);
+      if (s.phones) h += phonesHTML(s, c.id);
+      else if (s.screen || s.take) h += screenHTML(s, c.id);
       /* the callouts printed on a board, as real text: read aloud everywhere, shown on phones where the board is too small to read */
       else if (s.notes) h += '<ul class="cs-notes">' + s.notes.map(function (n) { return "<li><b>" + esc(n[0]) + "</b> " + esc(n[1]) + "</li>"; }).join("") + "</ul>";
       /* type specimens, set in the real fonts */
@@ -2654,9 +2891,8 @@
       "Designed the Help Center flow for the new Halan Borsa app from the real support journey, so people solve common issues without calling support.",
       "Prototyped and animated the card-approval success screens: clear, instant confirmation that feels on-brand.",
       "Designed the authentication and Halan Card application flows for the UAE app, from entry to submission, inside the existing design system."] },
-    xperience: { when: "May – Jul 2026", role: "UI/UX designer, team lead", where: "Xperience Software Solutions", pts: [
-      "Led a design team: planning the work, managing tasks and mentoring members.",
-      "Designed an ERP system built from its SRS requirements.",
+    xperience: { when: "May – Jul 2026", role: "UI/UX designer", where: "Xperience Software Solutions", pts: [
+      "Designed Maaliy, an ERP system built from its SRS requirements.",
       "Advanced UI/UX workshop: SaaS, ERP and CRM dashboards, scalable design systems and stakeholder interviews."] },
     zain: { when: "Jan 2025 – Jun 2026", role: "Graphic designer, full time", where: "Zain Group", pts: [
       "Designed full brand identities: social media posts, reels, branding and packaging.",
@@ -3003,9 +3239,11 @@
   var IMG = "f/";
   function tape(x, y, w, r, kind, color) { return '<i class="j-tape ' + (kind || "") + '" data-ends="1" style="' + box(x, y, w, null, r) + (color ? ";--tc:" + color : "") + '"></i>'; }
   function pola(src, cap, alt, x, y, w, h, r, extra) {
-    return '<figure class="j-pola dr" data-w="' + (w + 28) + '" style="' + box(x, y, w + 28, h + 66, r) + '"><img src="' + IMG + src + '" alt="' + esc(alt) + '" draggable="false"><figcaption>' + esc(cap) + "</figcaption></figure>" + (extra || "");
+    return '<figure class="j-pola dr" data-w="' + (w + 28) + '" style="' + box(x, y, w + 28, h + 66, r) + '"><img src="' + IMG + src + '" alt="' + esc(alt) + '" draggable="false"><figcaption' + capFit(cap, w + 16) + ">" + esc(cap) + "</figcaption></figure>" + (extra || "");
   }
-  function cut(src, alt, x, y, w, h, r) { return '<figure class="j-cut dr" data-w="' + w + '" data-h="' + h + '" style="' + box(x, y, w, h, r) + '"><img src="' + IMG + src + '" alt="' + esc(alt) + '" draggable="false"></figure>'; }
+  function cut(src, alt, x, y, w, h, r, cap) { return '<figure class="j-cut dr" data-w="' + w + '" data-h="' + h + '" style="' + box(x, y, w, h, r) + '"><img src="' + IMG + src + '" alt="' + esc(alt) + '" draggable="false">' + (cap ? '<figcaption class="j-cutcap"' + capFit(cap, w + 40) + ">" + esc(cap) + "</figcaption>" : "") + "</figure>"; }
+  /* captions keep the 20px hand size when they fit on one line, and shrink a little (never below 15px) when they don't */
+  function capFit(cap, room) { var fs = Math.max(15, Math.min(20, room / (cap.length * 0.55))); return fs < 20 ? ' style="font-size:' + J(fs.toFixed(1)) + '"' : ""; }
   function snip(html, x, y, w, r, cls, tear) { return '<div class="j-snip ' + (cls || "") + '" data-tear="' + (tear || "b") + '" style="' + box(x, y, w, null, r) + '">' + html + "</div>"; }
   function note(html, x, y, w, r, cls) { return '<p class="j-note ' + (cls || "") + '" style="' + box(x, y, w, null, r) + '">' + html + "</p>"; }
   /* hand notes are written in Architects Daughter, the journal's one handwriting face */
@@ -3056,7 +3294,7 @@
   function entry(top, mid, bot, color, shape, x, y, w, r) { return '<figure class="j-ink" style="' + box(x, y, w, w * (shape === "circle" ? 0.62 : 0.62), r) + '">' + ART.entry(top, mid, bot, color, shape) + "</figure>"; }
   /* a postage stamp with a little drawn tool icon (generic drawings, not brand logos) */
   function pstamp(icon, label, val, x, y, w, r, bg) {
-    return '<figure class="j-pst dr" style="' + box(x, y, w, w * 1.16, r) + (bg ? ";--ps:" + bg : "") + '"><span class="in"><b class="v">' + val + '</b><svg viewBox="0 0 44 44" aria-hidden="true">' + ART.icon[icon] + '</svg><b class="l">' + label + "</b></span></figure>";
+    return '<figure class="j-pst dr" style="' + box(x, y, w, w * 1.16, r) + (bg ? ";--ps:" + bg : "") + '"><span class="in"><b class="v">' + val + '</b><span class="lg' + (icon.length > 1 ? " two" : "") + '">' + icon.map(function (n) { return '<img src="' + IMG + "tools/" + n + (TOOL_SVG.indexOf(n) < 0 ? ".png" : ".svg") + '" alt="" draggable="false">'; }).join("") + '</span><b class="l">' + label + "</b></span></figure>";
   }
   /* Doha's own elements, used exactly as sent (only the background is removed):
      the Palestine sticker set, cassette, mint tea, Turkish coffee, the papers */
@@ -3108,11 +3346,11 @@
   P.push({ cls: "grid", html:
     wash(60, 80, 560, 380, "rgba(156,209,109,.55)") +
     type("things I love", 64, 60, -3, "dark") +
-    pola("p-matcha.webp", "matcha o'clock", "Cartoon of a girl in sunglasses sipping matcha", 70, 170, 220, 220, -6, tape(120, 152, 130, 8, "", "#A9BC8E")) +
-    pola("p-latte.webp", "iced latte", "A glass of iced latte in the sun", 360, 150, 160, 210, 4, tape(390, 138, 110, -4, "dots")) +
-    cut("p-bread.webp", "A loaf of homemade sourdough on a cooling rack", 570, 190, 180, 180, 6) +
-    pola("p-sushi.webp", "sushi nights", "A platter of sushi rolls and noodles", 80, 500, 210, 190, 3, tape(140, 488, 120, -6, "grid", "#E9C46A")) +
-    pola("p-eggs.webp", "breakfast", "Two fried eggs with chilli flakes in a pan", 360, 470, 190, 220, -4) +
+    pola("p-matcha.webp", "matcha is a personality trait", "Cartoon of a girl in sunglasses sipping matcha", 70, 170, 220, 220, -6, tape(120, 152, 130, 8, "", "#A9BC8E")) +
+    pola("p-latte.webp", "daily dose of caffeine", "A glass of iced latte in the sun", 360, 150, 160, 210, 4, tape(390, 138, 110, -4, "dots")) +
+    cut("p-bread.webp", "A loaf of homemade sourdough on a cooling rack", 570, 190, 180, 180, 6, "sourdough straight out of the oven") +
+    pola("p-sushi.webp", "sushi fixes everything", "A platter of sushi rolls and noodles", 80, 500, 210, 190, 3, tape(140, 488, 120, -6, "grid", "#E9C46A")) +
+    pola("p-eggs.webp", "slow mornings, please", "Two fried eggs with chilli flakes in a pan", 360, 470, 190, 220, -4) +
     cut("p-bowls.webp", "Three wooden bowls of salad with green dressing", 590, 520, 170, 130, -5) +
     note("matcha, mint tea, Turkish coffee, homemade<br>sourdough and a table full of good food.", 90, 860, 520, -1, "small") +
     kst("tea", "Sticker: a glass of tea with fresh mint", 600, 670, 130, 8) + kst("coffee", "Photo: Turkish coffee in a patterned cup", -10, 380, 140, -10, "real") + kst("watermelon", "Sticker: a slice of watermelon", 590, 860, 180, -8) + doodle(HEART, 650, 60, 70, 70, 10) });
@@ -3120,12 +3358,12 @@
   P.push({ cls: "", html:
     wash(180, 80, 560, 460, "rgba(156,198,217,.6)") +
     type("little trips", 470, 56, 3, "sage") +
-    pola("p-nile.webp", "the Nile", "Sunset over the Nile from under a parasol", 56, 110, 210, 260, -5, tape(100, 96, 130, -8, "kraft")) +
-    pola("p-bahrain.webp", "Manama", "Rofaida on a boat with a city skyline behind her", 330, 160, 180, 240, 4, tape(370, 146, 110, 6, "dots", "#9CC6D9")) +
-    cut("p-ship.webp", "The bridge of a ferry named Sinai 7", 560, 170, 200, 150, -4) +
+    pola("p-nile.webp", "somewhere by the Nile", "Sunset over the Nile from under a parasol", 56, 110, 210, 260, -5, tape(100, 96, 130, -8, "kraft")) +
+    pola("p-bahrain.webp", "Doha after dark", "Rofaida by the water with the Doha skyline behind her", 330, 160, 180, 240, 4, tape(370, 146, 110, 6, "dots", "#9CC6D9")) +
+    cut("p-ship.webp", "The bridge of a ferry named Sinai 7", 560, 170, 200, 150, -4, "just passing through") +
     doodle('<path d="M6 92 Q30 40 70 46 T96 6" stroke-dasharray="4 7"/>', 560, 330, 200, 200, 0) + sticker("p-plane.webp", "Sticker: a little white plane", 570, 380, 200, 130, -14) +
-    pola("p-makkah.webp", "Makkah", "A street in Makkah at night", 70, 520, 190, 230, 3, tape(120, 508, 110, -5, "grid", "#A9BC8E")) +
-    pola("p-scarf.webp", "beach, at night", "Rofaida wrapped in a scarf on a beach at night", 320, 580, 250, 180, -4) +
+    pola("p-makkah.webp", "a place of peace", "A street in Makkah at night", 70, 520, 190, 230, 3, tape(120, 508, 110, -5, "grid", "#A9BC8E")) +
+    pola("p-scarf.webp", "after-hours by the sea", "Rofaida wrapped in a scarf on a beach at night", 320, 580, 250, 180, -4) +
     entry("CAIRO", "", "EGYPT &middot; 2026", "#B0302F", "rect", 590, 530, 190, -9) +
     entry("SAUDI ARABIA", "", "MAKKAH", "#2E6B3F", "oval", 586, 680, 200, 6) +
     entry("QATAR", "", "DOHA", "#7A1F2B", "circle", 610, 830, 180, -7) +
@@ -3135,12 +3373,12 @@
   /* 4 · the little things */
   P.push({ cls: "grid", html:
     type("the little things", 64, 56, -2) +
-    cut("p-wall.webp", "Rofaida in front of a wall of anime posters", 60, 150, 230, 290, -4) +
-    pola("p-aot.webp", "anime nights", "Anime still of two characters in uniform", 330, 140, 170, 170, 5, tape(370, 128, 110, -6, "dots")) +
-    pola("p-sketch.webp", "sketching", "A hand sketching a building in watercolour", 545, 180, 190, 150, -3, tape(590, 168, 110, 5)) +
-    pola("p-catlaptop.webp", "my coworker", "A cat yawning in front of a laptop", 60, 500, 180, 180, -5) +
-    pola("p-desk.webp", "dream desk", "Illustration of a cosy desk with posters and a lamp", 320, 450, 290, 180, 3, tape(420, 438, 120, -3, "grid", "#9CC6D9")) +
-    pola("p-catsuit.webp", "CEO of the house", "A cat in a suit holding an iced coffee", 560, 700, 170, 160, 6) +
+    cut("p-night.webp", "Rofaida at her desk at night, in a hoodie and headphones, under anime posters and a lamp", 60, 150, 230, 290, -4, "currently in my own world") +
+    pola("p-aot.webp", "one more episode", "Anime still of two characters in uniform", 330, 140, 170, 170, 5, tape(370, 128, 110, -6, "dots")) +
+    pola("p-sketch.webp", "ideas in progress", "A hand sketching a building in watercolour", 545, 180, 190, 150, -3, tape(590, 168, 110, 5)) +
+    pola("p-catlaptop.webp", "my favorite distraction", "A cat yawning in front of a laptop", 60, 500, 180, 180, -5) +
+    pola("p-desk.webp", "my creative corner", "Illustration of a cosy desk with posters and a lamp", 320, 450, 290, 180, 3, tape(420, 438, 120, -3, "grid", "#9CC6D9")) +
+    pola("p-catsuit.webp", "the actual boss", "A cat in a suit holding an iced coffee", 560, 700, 170, 160, 6) +
     hand("calligraphy,<br>sketches &amp;<br>too many<br>anime posters", 404, 730, -4, 24) +
     kst("keffiyeh", "Sticker: a Palestinian keffiyeh", 650, 420, 120, 6) + kst("cassette", "Sticker: a vintage cassette tape", 90, 800, 220, -6) +
     doodle(STAR, 700, 60, 50, 50, 0) + doodle(STAR, 290, 700, 34, 34, 0) });
@@ -3150,33 +3388,39 @@
      site = a case-study id from cases.js (e.g. "maaliy"). Empty = shown as "coming soon". */
   var WORK = [
     { y: "2026", when: "Jul &ndash; Sep 2026", role: "Product design intern", co: "MNT-Halan",
-      did: ["Help Center flow for the new Halan Borsa app", "Card-approval success screens, prototyped and animated", "Authentication flow for the UAE app", "Halan Card application flow, UAE app"],
-      more: '<p class="hw sm">all inside an existing design system</p>', links: { behance: "", figma: "", site: "" } },
-    { y: "2026", when: "May &ndash; Jul 2026", role: "UI/UX designer, team lead", co: "Xperience Software Solutions",
-      did: ["Led a design team on an ERP system built from its SRS", "Managed tasks and mentored the team"], links: { behance: "", figma: "", site: "" } },
+      did: ["<b>Simplified the application flow:</b> reduced the UAE Halan Card application from an initially proposed 4&ndash;5 steps to 3, keeping applicants&rsquo; details visible throughout the process.", "<b>Made support more accessible:</b> designed an AI-first Help Center for Halan Borsa, helping users find answers to common questions in-app before reaching the call center.", "<b>Streamlined the card request experience:</b> removed an unnecessary step from the physical-card request flow and prepared a Lottie animation for developer handoff.", "<b>Improved verification feedback:</b> prototyped and animated several takes on the verification-code step, so users get clear, immediate confirmation when their code is accepted."],
+      more: '<p class="hw sm">all inside an existing design system</p>', links: { site: [["MNT-Halan case study", "halan"]] } },
+    { y: "2026", when: "May &ndash; Jul 2026", role: "UI/UX design intern", co: "Xperience Software Solutions",
+      did: ["Translated the SRS into a client-centered structure, bringing entries, invoices, and tax records into one view instead of scattering them across the system.", "Added a tax-deadline calendar with alerts, helping accountants keep track of upcoming obligations.", "Built an RTL design system across 14+ screens and 7 roles to maintain consistency as the product grows."], links: { site: [["Maaliy case study", "maaliy"]] } },
     { y: "2025&ndash;26", when: "2025 &ndash; Jun 2026 &middot; full time", role: "Graphic designer", co: "Zain Iq Group",
-      did: ["Branding &amp; visual identity", "Packaging", "Social media posts &amp; reels", "Motion graphics", "Photo manipulation", "AI-assisted design workflows"],
-      more: '<p class="lbl">tools there</p><p class="hw sm">Photoshop, Illustrator, After Effects, Freepik AI, Kling AI</p>', links: { behance: "", figma: "", site: "" } },
+      did: ["Gave the Traubi and Dalya campaigns their own visual worlds, from posts and reels to motion", "Delivered branding, packaging and photo manipulation across the group&rsquo;s brands", "Brought AI tools into the team&rsquo;s workflow for campaign visuals"],
+      more: '<p class="lbl">tools there</p><p class="hw sm">Photoshop, Illustrator, After Effects, Freepik AI, Kling AI</p>', links: { be: [["Traubi campaign", "https://www.behance.net/gallery/250717001/Traubi-SocialMedia-Campaign"], ["Dalya campaign", "https://www.behance.net/gallery/250732059/Dalya-SocialMedia-Campaign"]] } },
     { y: "2023", when: "2023", role: "Design intern", co: "GRAAPHI &middot; Social Nuts &middot; Animatix",
-      did: ["GRAAPHI: social posts for the agency&rsquo;s page and clients like Mediterraneo and Land Max Magam", "Social Nuts: campaigns for KiloKabab, Misr Italia and ARPU, with the copywriters", "Animatix: three days organising the animation event, guiding visitors and working with the instructors"],
-      links: { behance: "", figma: "", site: "" } },
-    { y: "2021&ndash;22", when: "2021 &ndash; 22", role: "Social media head", co: "Microsoft Student Partners (MSP)",
-      did: ["Planned session content and coordinated the student team", "Assigned tasks and followed up", "Taught design basics in student sessions: colour, type, layout, composition"],
-      more: '<p class="lbl">achievements</p><p class="hw sm">Best social media head, MSP &middot; Best graphic design head, 2022</p>', links: { behance: "", figma: "", site: "" } },
+      did: ["GRAAPHI: shaped the social presence of the agency&rsquo;s page and of clients like Mediterraneo and Land Max Magam", "Social Nuts: turned the copywriters&rsquo; ideas into campaigns for KiloKabab, Misr Italia and ARPU", "Animatix: helped run a three-day animation event, guiding visitors and supporting the instructors"],
+      links: { be: [["Kilo Kabab and Breadfast", "https://www.behance.net/gallery/194862413/Socia-media-post-designs-V1"]] } },
+    { y: "2021&ndash;22", when: "2021 &ndash; 22", role: "Multimedia head", co: "Microsoft Student Partners (MSP)",
+      did: ["Led the student media team: planned the sessions, shared out the work and followed it through", "Taught other students the basics of design: colour, type, layout and composition", "Recognised twice for it: best social media head and best graphic design head, 2022"],
+      links: {} },
     { y: "2021", when: "2021", role: "Graphic design trainee", co: "Akhbar El-Youm newspaper",
-      did: ["Printing processes", "Magazine ads", "Outdoor advertising"], links: { behance: "", figma: "", site: "" } }
+      did: ["Learned the print side of design: printing processes, magazine ads and outdoor advertising, the base for my later branding work"], links: {} }
   ];
   function wlink(kind, label, v) {
     if (!v) return '<span class="lk soon" title="link coming soon"><b>' + label + "</b><small>coming soon</small></span>";
     if (kind === "site") return '<a class="lk" href="#work/' + v + '" data-jcase="' + v + '"><b>' + label + "</b><small>open the case study</small></a>";
     return '<a class="lk" href="' + v + '" target="_blank" rel="noopener"><b>' + label + " &#8599;</b><small>" + (kind === "behance" ? "on Behance" : "in Figma") + "</small></a>";
   }
+  /* links per job: site = [[label, case id]], be = [[label, Behance URL]]; a job with no links shows no "see the work" */
+  function wlinks(L) {
+    var h = (L.site || []).map(function (l) { return '<a class="lk" href="#work/' + l[1] + '" data-jcase="' + l[1] + '"><b>' + l[0] + "</b><small>open the case study</small></a>"; }).join("") +
+      (L.be || []).map(function (l) { return '<a class="lk" href="' + l[1] + '" target="_blank" rel="noopener"><b>' + l[0] + " &#8599;</b><small>on Behance</small></a>"; }).join("");
+    return h ? '<p class="lbl">see the work</p><div class="jw-links">' + h + "</div>" : "";
+  }
   function wpop(w, i) {
     return '<div class="j-sheet tight jw-pop" id="jw-pop-' + i + '" data-job="' + i + '" role="region" aria-label="' + esc(w.role.replace(/&[^;]+;/g, " ")) + '">' +
       '<i class="u1"></i><div class="sh"><button class="jw-x" type="button" aria-label="Close this sheet">&times;</button>' +
       '<p class="lbl">' + w.when + "</p>" + job(w.role, w.co, []) +
-      '<p class="lbl">what I did</p>' + bullets(w.did, "pen") + (w.more || "") +
-      '<p class="lbl">see the work</p><div class="jw-links">' + wlink("behance", "Behance", w.links.behance) + wlink("figma", "Figma", w.links.figma) + wlink("site", "On this site", w.links.site) + "</div>" +
+      '<p class="lbl">the impact</p>' + bullets(w.did, "pen") + (w.more || "") +
+      wlinks(w.links) +
       "</div></div>";
   }
   P.push({ cls: "jfolder jwork", html:
@@ -3185,7 +3429,7 @@
     sheet('<p class="lbl">name</p><p class="hw">Rofaida Abdelwahap</p><p class="lbl">role</p><p class="hw">Product &amp; visual designer</p><p class="lbl">based in</p><p class="hw">Cairo, Egypt</p>', 40, 470, 300, 3, "", 0, "torn") +
     kst("dove", "Sticker: a white dove", 150, 860, 150, -8) +
     WORK.map(wpop).join("") +
-    sheet('<h2 class="ttl">My work<br>journey</h2><p class="hw sm jw-hint">from now, back to the start.<br><span class="hov">hover a job</span><span class="tap">tap a job</span> to pull out its sheet</p>' +
+    sheet('<h2 class="ttl">My work<br>journey</h2><p class="hw sm jw-hint">From my first design role to where I am today.<br><span class="hov">Hover over a role</span><span class="tap">Tap a role</span> to explore the work behind it.</p>' +
       '<ol class="idx jw-idx">' + WORK.map(function (w, i) {
         return '<li><button class="jw-row" type="button" data-job="' + i + '" aria-expanded="false" aria-controls="jw-pop-' + i + '"><b>' + w.y + "</b><span>" + w.role + "<small>" + w.co.replace(/ \(MSP\)/, "").replace(/ Software Solutions| newspaper/, "") + "</small></span><i aria-hidden=\"true\"></i></button></li>"; }).join("") + "</ol>",
       372, 54, 398, 1.5, "paperclip", 2, "tight jw-index") });
@@ -3207,8 +3451,10 @@
     kst("coffee", "Photo: Turkish coffee in a patterned cup, from above", 615, 800, 175, 8, "real") +
     hand("always<br>learning", 645, 520, 6, 28) + doodle(STAR, 700, 440, 44, 44, 0) });
   /* 7 · toolbox: a sheet of postage stamps */
-  var TOOLS = [["frame", "Figma"], ["layers", "Photoshop"], ["nib", "Illustrator"], ["keys", "After Effects"], ["cube", "Blender"], ["cube", "3ds Max"],
-    ["click", "Framer"], ["spark", "Figma Make"], ["chat", "Claude"], ["spark", "Freepik AI"], ["film", "Kling AI"], ["check", "Notion &middot; Jira"]];
+  var TOOL_SVG = [];   /* all stamps use the PNG logos Doha sent on Nov 4 */
+  /* each stamp shows the tool's own logo (Doha's files in f/tools/); Figma and Figma Make share one stamp and one logo */
+  var TOOLS = [[["figma"], "Figma &middot; Figma Make"], [["photoshop"], "Photoshop"], [["illustrator"], "Illustrator"], [["after-effects"], "After Effects"], [["blender"], "Blender"], [["3ds-max"], "3ds Max"],
+    [["framer"], "Framer"], [["claude"], "Claude"], [["freepik-ai"], "Freepik AI"], [["kling-ai"], "Kling AI"], [["notion"], "Notion"], [["jira"], "Jira"]];
   var PS = ["#C8DDE3", "#F1D2C8", "#D5DFC0", "#F2DFA6"];
   P.push({ cls: "grid", html:
     type("my toolbox", 64, 56, -2, "dark") +
@@ -3221,7 +3467,7 @@
   P.push({ cls: "ruled", html:
     wash(100, 120, 620, 520, "rgba(231,169,160,.45)") +
     hand("to be continued&hellip;", 80, 150, -3, 58) +
-    note("The next page is still blank. I&rsquo;m open to product design roles and selected freelance work, especially <b>Arabic-first products</b>.", 80, 300, 600, -1) +
+    note("The next page is still blank. I&rsquo;m open to product design roles and selected freelance work, where a <b>visual eye</b> and <b>product thinking</b> meet.", 80, 300, 600, -1) +
     cta("Let&rsquo;s talk &rarr;", 90, 540, -2, 'href="#contact" data-jgo="contact"') +
     cta("My resume &#8599;", 390, 540, 2, 'href="' + DRIVE + '" target="_blank" rel="noopener"') +
     kst("olive", "Sticker: an olive branch", 60, 700, 170, -6) + kst("watermelon", "Sticker: a slice of watermelon", 280, 740, 190, 6) +
@@ -3743,7 +3989,7 @@
     mobileCalm:     0.7
   };
 
-  var MODEL = {"size":[1840,2304],"rings":{"silver":{"c":[708.0,736.0],"rin":100,"rout":157},"gold":{"c":[866.0,727.0],"rin":56,"rout":103}},"charms":[{"id":"design-thinking","label":"Design Thinking","x":41,"y":639,"w":571,"h":375,"area":126560,"com":[261.66473609355245,181.87100189633372],"attach":[562.0,120.0],"attachW":[603.0,759.0],"parent":"silver","hangW":[579.0,724.0],"chain":0,"z":54},{"id":"branding","label":"Branding","x":1152,"y":721,"w":606,"h":363,"area":109000,"com":[309.18852293577993,179.73877064220187],"attach":[21.67178795707173,96.25046573490658],"attachW":[1173.6717879570717,817.2504657349066],"parent":"gold","hangW":[962.1400395462242,770.7735847683678],"chain":4,"z":57},{"id":"uiux","label":"UI/UX","x":1236,"y":969,"w":405,"h":319,"area":73109,"com":[208.3201110670368,159.04799682665612],"attach":[7.9377583196665,69.09238003097721],"attachW":[1243.9377583196665,1038.0923800309772],"parent":"gold","hangW":[942.1710148481252,796.7959353820428],"chain":5,"z":67},{"id":"figma","label":"Figma","x":113,"y":1000,"w":328,"h":340,"area":71688,"com":[165.72039950898335,162.46631235353198],"attach":[208.3150016115871,26.770514176246934],"attachW":[321.3150016115871,1026.770514176247],"parent":"design-thinking","hangW":[384.31918035412093,928.7355755212421],"chain":7,"z":70},{"id":"spark","label":"Spark","x":447,"y":1020,"w":295,"h":362,"area":69450,"com":[147.68673866090717,170.34747300215986],"attach":[138.14120929343414,4.434063326123578],"attachW":[585.1412092934341,1024.4340633261236],"parent":"silver","hangW":[630.6007704167413,876.6199574814718],"chain":1,"z":72},{"id":"claude","label":"Claude","x":878,"y":1037,"w":298,"h":320,"area":69539,"com":[146.37108672831073,162.30594342742916],"attach":[114.21703894325651,-2.1051339954042305],"attachW":[992.2170389432565,1034.8948660045958],"parent":"gold","hangW":[896.3855199082736,820.7838923088992],"chain":3,"z":71},{"id":"adobe","label":"Adobe","x":1126,"y":1228,"w":308,"h":321,"area":72584,"com":[155.23633307616,165.0998153863111],"attach":[105.58312518568437,11.885788783007229],"attachW":[1231.5831251856844,1239.8857887830072],"parent":"uiux","hangW":[1249.136682905694,1029.0453825314185],"chain":6,"z":90},{"id":"lightning","label":"Lightning","x":703,"y":1253,"w":207,"h":345,"area":39208,"com":[97.0980412160784,152.13744643950213],"attach":[107.20833705021153,19.485348514565658],"attachW":[810.2083370502115,1272.4853485145657],"parent":"silver","hangW":[769.9581955176022,885.000642111264],"chain":2,"z":83},{"id":"motion","label":"Motion","x":1400,"y":1287,"w":429,"h":360,"area":78363,"com":[217.03791330092008,183.06879522223494],"attach":[48.0,10.0],"attachW":[1448.0,1297.0],"parent":"adobe","hangW":[1398.6935483870968,1273.5],"chain":11,"z":85},{"id":"cloud","label":"Daydream","x":94,"y":1334,"w":312,"h":256,"area":54600,"com":[159.04761904761904,136.3081318681318],"attach":[154.0,8.0],"attachW":[248.0,1342.0],"parent":"figma","hangW":[262.82716049382714,1324.79012345679],"chain":8,"z":83},{"id":"illustrations","label":"Illustrations","x":516,"y":1428,"w":329,"h":645,"area":108357,"com":[161.73490406711153,336.45173823564687],"attach":[78.76195835796761,21.799296043033337],"attachW":[594.7619583579676,1449.7992960430333],"parent":"spark","hangW":[627.291253571804,1344.560094993935],"chain":9,"z":107},{"id":"after-effects","label":"After Effects","x":251,"y":1639,"w":313,"h":312,"area":72497,"com":[154.88857469964273,157.431038525732],"attach":[240.32431909813636,23.42936260259853],"attachW":[491.32431909813636,1662.4293626025985],"parent":"illustrations","hangW":[533.0825768739345,1612.2931644478801],"chain":10,"z":101}],"chains":[{"id":0,"parent":"silver","child":"design-thinking","x":549,"y":698,"w":7,"h":20,"p":[579.0,724.0],"c":[603.0,759.0],"len":42.43819034784589,"strip":{"w":43,"h":36,"smin":-41.3513480737938,"tmin":-9.634632799945624},"secondary":false},{"id":1,"parent":"silver","child":"spark","x":559,"y":849,"w":123,"h":193,"p":[630.6007704167413,876.6199574814718],"c":[585.1412092934341,1024.4340633261236],"len":154.6466345711332,"strip":{"w":104,"h":211,"smin":-19.110376644313558,"tmin":-62.33284459495877},"secondary":false},{"id":2,"parent":"silver","child":"lightning","x":735,"y":873,"w":117,"h":404,"p":[769.9581955176022,885.000642111264],"c":[810.2083370502115,1272.4853485145657],"len":389.5695978767439,"strip":{"w":92,"h":421,"smin":-12.382305364320485,"tmin":-50.30610863858924},"secondary":false},{"id":3,"parent":"gold","child":"claude","x":836,"y":808,"w":202,"h":273,"p":[896.3855199082736,820.7838923088992],"c":[992.2170389432565,1034.8948660045958],"len":234.57874817952188,"strip":{"w":103,"h":319,"smin":-21.499544269663705,"tmin":-42.21761233159978},"secondary":false},{"id":4,"parent":"gold","child":"branding","x":956,"y":750,"w":236,"h":105,"p":[962.1400395462242,770.7735847683678],"c":[1173.6717879570717,817.2504657349066],"len":216.57742507040734,"strip":{"w":97,"h":257,"smin":-6.44622545344305,"tmin":-31.616143866854962},"secondary":false},{"id":5,"parent":"gold","child":"uiux","x":930,"y":779,"w":334,"h":286,"p":[942.1710148481252,796.7959353820428],"c":[1243.9377583196665,1038.0923800309772],"len":386.376942461161,"strip":{"w":108,"h":404,"smin":-4.508707044882614,"tmin":-51.93048646718758},"secondary":false},{"id":6,"parent":"uiux","child":"adobe","x":1179,"y":1012,"w":107,"h":261,"p":[1249.136682905694,1029.0453825314185],"c":[1231.5831251856844,1239.8857887830072],"len":211.5698567777667,"strip":{"w":120,"h":280,"smin":-19.88792268862271,"tmin":-54.743436658465676},"secondary":false},{"id":7,"parent":"design-thinking","child":"figma","x":304,"y":916,"w":96,"h":121,"p":[384.31918035412093,928.7355755212421],"c":[321.3150016115871,1026.770514176247],"len":116.53486918562918,"strip":{"w":104,"h":148,"smin":-20.11028910078999,"tmin":-59.48139444116677},"secondary":false},{"id":8,"parent":"figma","child":"cloud","x":245,"y":1312,"w":76,"h":63,"p":[262.82716049382714,1324.79012345679],"c":[248.0,1342.0],"len":22.716173510127877,"strip":{"w":84,"h":94,"smin":-40.778599159358635,"tmin":-63.98390043152622},"secondary":false},{"id":9,"parent":"spark","child":"illustrations","x":569,"y":1336,"w":86,"h":132,"p":[627.291253571804,1344.560094993935],"c":[594.7619583579676,1449.7992960430333],"len":110.1519154829431,"strip":{"w":89,"h":151,"smin":-12.3158897469948,"tmin":-48.70161405322699},"secondary":false},{"id":10,"parent":"illustrations","child":"after-effects","x":478,"y":1596,"w":60,"h":81,"p":[533.0825768739345,1612.2931644478801],"c":[491.32431909813636,1662.4293626025985],"len":65.24868165625412,"strip":{"w":74,"h":99,"smin":-7.426749022607051,"tmin":-39.88727232032334},"secondary":false},{"id":11,"parent":"adobe","child":"motion","x":1393,"y":1259,"w":56,"h":68,"p":[1398.6935483870968,1273.5],"c":[1448.0,1297.0],"len":54.62029083276253,"strip":{"w":76,"h":79,"smin":-12.947921714386606,"tmin":-21.936169109256163},"secondary":false},{"id":12,"parent":"spark","child":"cloud","x":348,"y":1253,"w":148,"h":172,"p":[473.90680486360293,1277.272488594593],"c":[367.2326780249599,1416.0181337318293],"len":175.01349485492486,"strip":{"w":96,"h":207,"smin":-9.718463025547319,"tmin":-49.924467823815995},"secondary":true}],"hub":{"x":402,"y":117,"w":651,"h":787}};
+  var MODEL = {"size":[1840,2304],"rings":{"silver":{"c":[708.0,736.0],"rin":100,"rout":157},"gold":{"c":[866.0,727.0],"rin":56,"rout":103}},"charms":[{"id":"design-thinking","label":"Design Thinking","x":41,"y":639,"w":571,"h":375,"area":126560,"com":[261.66473609355245,181.87100189633372],"attach":[562.0,120.0],"attachW":[603.0,759.0],"parent":"silver","hangW":[579.0,724.0],"chain":0,"z":54},{"id":"branding","label":"Branding","x":1152,"y":721,"w":606,"h":363,"area":109000,"com":[309.18852293577993,179.73877064220187],"attach":[21.67178795707173,96.25046573490658],"attachW":[1173.6717879570717,817.2504657349066],"parent":"gold","hangW":[962.1400395462242,770.7735847683678],"chain":4,"z":57},{"id":"uiux","label":"UI/UX","x":1236,"y":969,"w":405,"h":319,"area":73109,"com":[208.3201110670368,159.04799682665612],"attach":[7.9377583196665,69.09238003097721],"attachW":[1243.9377583196665,1038.0923800309772],"parent":"gold","hangW":[942.1710148481252,796.7959353820428],"chain":5,"z":67},{"id":"figma","label":"Figma","x":113,"y":1000,"w":328,"h":340,"area":71688,"com":[165.72039950898335,162.46631235353198],"attach":[208.3150016115871,26.770514176246934],"attachW":[321.3150016115871,1026.770514176247],"parent":"design-thinking","hangW":[384.31918035412093,928.7355755212421],"chain":7,"z":70},{"id":"spark","label":"Claude","x":447,"y":1020,"w":295,"h":362,"area":69450,"com":[147.68673866090717,170.34747300215986],"attach":[138.14120929343414,4.434063326123578],"attachW":[585.1412092934341,1024.4340633261236],"parent":"silver","hangW":[630.6007704167413,876.6199574814718],"chain":1,"z":72},{"id":"claude","label":"Stitch AI","x":878,"y":1037,"w":298,"h":320,"area":69539,"com":[146.37108672831073,162.30594342742916],"attach":[114.21703894325651,-2.1051339954042305],"attachW":[992.2170389432565,1034.8948660045958],"parent":"gold","hangW":[896.3855199082736,820.7838923088992],"chain":3,"z":71},{"id":"adobe","label":"Adobe","x":1126,"y":1228,"w":308,"h":321,"area":72584,"com":[155.23633307616,165.0998153863111],"attach":[105.58312518568437,11.885788783007229],"attachW":[1231.5831251856844,1239.8857887830072],"parent":"uiux","hangW":[1249.136682905694,1029.0453825314185],"chain":6,"z":90},{"id":"lightning","label":"Brono AI","x":703,"y":1253,"w":207,"h":345,"area":39208,"com":[97.0980412160784,152.13744643950213],"attach":[107.20833705021153,19.485348514565658],"attachW":[810.2083370502115,1272.4853485145657],"parent":"silver","hangW":[769.9581955176022,885.000642111264],"chain":2,"z":83},{"id":"motion","label":"Motion","x":1400,"y":1287,"w":429,"h":360,"area":78363,"com":[217.03791330092008,183.06879522223494],"attach":[48.0,10.0],"attachW":[1448.0,1297.0],"parent":"adobe","hangW":[1398.6935483870968,1273.5],"chain":11,"z":85},{"id":"cloud","label":"Daydream","x":94,"y":1334,"w":312,"h":256,"area":54600,"com":[159.04761904761904,136.3081318681318],"attach":[154.0,8.0],"attachW":[248.0,1342.0],"parent":"figma","hangW":[262.82716049382714,1324.79012345679],"chain":8,"z":83},{"id":"illustrations","label":"Illustrations","x":516,"y":1428,"w":329,"h":645,"area":108357,"com":[161.73490406711153,336.45173823564687],"attach":[78.76195835796761,21.799296043033337],"attachW":[594.7619583579676,1449.7992960430333],"parent":"spark","hangW":[627.291253571804,1344.560094993935],"chain":9,"z":107},{"id":"after-effects","label":"After Effects","x":251,"y":1639,"w":313,"h":312,"area":72497,"com":[154.88857469964273,157.431038525732],"attach":[240.32431909813636,23.42936260259853],"attachW":[491.32431909813636,1662.4293626025985],"parent":"illustrations","hangW":[533.0825768739345,1612.2931644478801],"chain":10,"z":101}],"chains":[{"id":0,"parent":"silver","child":"design-thinking","x":549,"y":698,"w":7,"h":20,"p":[579.0,724.0],"c":[603.0,759.0],"len":42.43819034784589,"strip":{"w":43,"h":36,"smin":-41.3513480737938,"tmin":-9.634632799945624},"secondary":false},{"id":1,"parent":"silver","child":"spark","x":559,"y":849,"w":123,"h":193,"p":[630.6007704167413,876.6199574814718],"c":[585.1412092934341,1024.4340633261236],"len":154.6466345711332,"strip":{"w":104,"h":211,"smin":-19.110376644313558,"tmin":-62.33284459495877},"secondary":false},{"id":2,"parent":"silver","child":"lightning","x":735,"y":873,"w":117,"h":404,"p":[769.9581955176022,885.000642111264],"c":[810.2083370502115,1272.4853485145657],"len":389.5695978767439,"strip":{"w":92,"h":421,"smin":-12.382305364320485,"tmin":-50.30610863858924},"secondary":false},{"id":3,"parent":"gold","child":"claude","x":836,"y":808,"w":202,"h":273,"p":[896.3855199082736,820.7838923088992],"c":[992.2170389432565,1034.8948660045958],"len":234.57874817952188,"strip":{"w":103,"h":319,"smin":-21.499544269663705,"tmin":-42.21761233159978},"secondary":false},{"id":4,"parent":"gold","child":"branding","x":956,"y":750,"w":236,"h":105,"p":[962.1400395462242,770.7735847683678],"c":[1173.6717879570717,817.2504657349066],"len":216.57742507040734,"strip":{"w":97,"h":257,"smin":-6.44622545344305,"tmin":-31.616143866854962},"secondary":false},{"id":5,"parent":"gold","child":"uiux","x":930,"y":779,"w":334,"h":286,"p":[942.1710148481252,796.7959353820428],"c":[1243.9377583196665,1038.0923800309772],"len":386.376942461161,"strip":{"w":108,"h":404,"smin":-4.508707044882614,"tmin":-51.93048646718758},"secondary":false},{"id":6,"parent":"uiux","child":"adobe","x":1179,"y":1012,"w":107,"h":261,"p":[1249.136682905694,1029.0453825314185],"c":[1231.5831251856844,1239.8857887830072],"len":211.5698567777667,"strip":{"w":120,"h":280,"smin":-19.88792268862271,"tmin":-54.743436658465676},"secondary":false},{"id":7,"parent":"design-thinking","child":"figma","x":304,"y":916,"w":96,"h":121,"p":[384.31918035412093,928.7355755212421],"c":[321.3150016115871,1026.770514176247],"len":116.53486918562918,"strip":{"w":104,"h":148,"smin":-20.11028910078999,"tmin":-59.48139444116677},"secondary":false},{"id":8,"parent":"figma","child":"cloud","x":245,"y":1312,"w":76,"h":63,"p":[262.82716049382714,1324.79012345679],"c":[248.0,1342.0],"len":22.716173510127877,"strip":{"w":84,"h":94,"smin":-40.778599159358635,"tmin":-63.98390043152622},"secondary":false},{"id":9,"parent":"spark","child":"illustrations","x":569,"y":1336,"w":86,"h":132,"p":[627.291253571804,1344.560094993935],"c":[594.7619583579676,1449.7992960430333],"len":110.1519154829431,"strip":{"w":89,"h":151,"smin":-12.3158897469948,"tmin":-48.70161405322699},"secondary":false},{"id":10,"parent":"illustrations","child":"after-effects","x":478,"y":1596,"w":60,"h":81,"p":[533.0825768739345,1612.2931644478801],"c":[491.32431909813636,1662.4293626025985],"len":65.24868165625412,"strip":{"w":74,"h":99,"smin":-7.426749022607051,"tmin":-39.88727232032334},"secondary":false},{"id":11,"parent":"adobe","child":"motion","x":1393,"y":1259,"w":56,"h":68,"p":[1398.6935483870968,1273.5],"c":[1448.0,1297.0],"len":54.62029083276253,"strip":{"w":76,"h":79,"smin":-12.947921714386606,"tmin":-21.936169109256163},"secondary":false},{"id":12,"parent":"spark","child":"cloud","x":348,"y":1253,"w":148,"h":172,"p":[473.90680486360293,1277.272488594593],"c":[367.2326780249599,1416.0181337318293],"len":175.01349485492486,"strip":{"w":96,"h":207,"smin":-9.718463025547319,"tmin":-49.924467823815995},"secondary":true}],"hub":{"x":402,"y":117,"w":651,"h":787}};
 
   /* ------------------------------------------------------------------ setup */
   var hero = document.getElementById("kcHero"), stage = document.getElementById("kcStage");

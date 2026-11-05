@@ -12,13 +12,14 @@ Upload the **contents of `site/`** to any static host and point your domain at i
 
 | Host | How |
 | --- | --- |
-| Netlify | Drag the `site` folder onto app.netlify.com/drop, or connect this repo with publish directory `site` (already set in `netlify.toml`). |
+| Netlify (current) | Connected to this repo: every push to `main` redeploys. Publish directory `site` is set in `netlify.toml`. |
 | Vercel | Import the repo; `vercel.json` serves `site/`. |
 | Cloudflare Pages | Connect the repo, build command empty, output directory `site`. |
-| GitHub Pages | Settings → Pages → deploy from a branch → `main` / `/site` is not offered, so use the included workflow (`.github/workflows/pages.yml`) and set Source to "GitHub Actions". On a free account the repo must be public. |
 | Any server (Nginx, Apache, cPanel) | Copy the contents of `site/` into the web root. |
 
 Then add your custom domain in the host's settings.
+
+GitHub Pages is not used: this repo is private, and free GitHub accounts only get Pages on public repos.
 
 ## Run it locally
 

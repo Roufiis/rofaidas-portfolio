@@ -12,7 +12,7 @@ Upload the **contents of `site/`** to any static host and point your domain at i
 
 | Host | How |
 | --- | --- |
-| Cloudflare Pages (current) | Every push to `main` deploys `site/` to https://rofaidas-portfolio.pages.dev through `.github/workflows/cloudflare-pages.yml`. Needs two repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. |
+| Cloudflare Pages (current) | Every push to `main` deploys `site/` to https://rofaidaabdelwahap.pages.dev (and points the old rofaidas-portfolio.pages.dev there, from `redirect/`) through `.github/workflows/cloudflare-pages.yml`. Needs two repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. |
 | Netlify | `netlify.toml` publishes `site`. Note: `netlify.app` addresses are blocked on some networks in the region. |
 | Vercel | Import the repo; `vercel.json` serves `site/`. |
 | Cloudflare Pages | Connect the repo, build command empty, output directory `site`. |

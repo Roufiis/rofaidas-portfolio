@@ -204,10 +204,10 @@ button{font:inherit;color:inherit}
   white-space:nowrap;pointer-events:none;text-shadow:0 2px 30px rgba(2,21,28,.08)}
 
 /* ---------------------------------------------------------- 0 · home */
-.f-home{--arw:1921;--arh:1096;--fx:.5;--fy:.5}
+.f-home{--arw:1921;--arh:1096;--fx:.5;--fy:1}   /* Nov 7 (Doha): crop from the sky, never from the grass, so the notebook and shoes stay in frame */
 /* lifted 70 art units (Doha, Oct 23): the plate grows from the bottom edge so the
    grass still reaches the floor, and her face keeps its x (it sits ~38 units higher) */
-.f-home .plate{position:absolute;left:calc(-617.6 * var(--k));top:calc(178.13 * var(--k));width:calc(2776.6 * var(--k));height:calc(925.5 * var(--k));
+.f-home .plate{position:absolute;left:calc(-617.6 * var(--k));top:calc(172.13 * var(--k));width:calc(2776.6 * var(--k));height:calc(925.5 * var(--k));
   -webkit-mask-image:linear-gradient(to bottom,transparent var(--mA,0%),#000 var(--mB,16%));mask-image:linear-gradient(to bottom,transparent var(--mA,0%),#000 var(--mB,16%))}
 .plate img.full{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
 .cloudloop{position:absolute;inset:0;overflow:hidden;pointer-events:none}

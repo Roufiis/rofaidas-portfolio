@@ -418,7 +418,8 @@
     return AC;
   }
   R.ctx = ctx; R.master = function () { ctx(); return master; };
-  function chime(freqs, gap, vol) {
+  function chime() { return; }   /* Nov 7 (Doha): no sound effects, only the soundtrack */
+  function chimeOff(freqs, gap, vol) {
     var a = ctx(); if (!a) return;
     freqs.forEach(function (f, i) {
       var t = a.currentTime + i * (gap || 0.09), o = a.createOscillator(), g = a.createGain();
@@ -428,6 +429,7 @@
     });
   }
   R.chime = chime;
+  /* Nov 7 (Doha): the meow stays; it and the soundtrack are the only sounds */
   /* the meow: Doha's recording (a/meow.mp3), one per tap. Each cat gets its own pitch,
      and every tap varies a hair so it never sounds copy-pasted. */
   var MEOW = { grey: 1, cream: 1.08, white: 1.15, black: 0.88, orange: 1.04, photo: 0.96 }, lastMeow = 0;
@@ -544,21 +546,12 @@
     mraf = parts.length ? requestAnimationFrame(mloop) : 0;
     if (!mraf) g2.clearRect(0, 0, cv.width, cv.height);
   }
-  var spotFx = {
-    cat: function () {},
-    headphones: function (b) { notes(b, 5); if (R.soundOn()) chime([587, 784], 0.08, 0.04); },
-    laptop: function () { if (R.soundOn()) chime([660, 990], 0.06, 0.04); },
-    notebook: function () { if (R.soundOn()) chime([1046, 1318, 1568], 0.07, 0.04); }
-  };
+  /* Nov 7 (Doha): no click effects on the home doors; a click just goes to its page */
   $$(".spot").forEach(function (b) {
     b.addEventListener("click", function (e) {
       e.preventDefault();
-      var k = b.getAttribute("data-spot"), to = b.getAttribute("data-go");
-      if (spotFx[k]) spotFx[k](b);
-      if (k === "cat") { restart(b, "go"); setTimeout(function () { b.classList.remove("go"); }, 420); return; }   /* the meow comes from the cat-tap listener */
-      if (!reduced) sparkle(b, 22);
-      restart(b, "go");
-      setTimeout(function () { b.classList.remove("go"); if (to) R.route(to); }, reduced || !to ? 0 : 520);
+      var to = b.getAttribute("data-go");
+      if (to) R.route(to);
     });
   });
   /* ============================================== the chatty cursor tooltip
@@ -1328,7 +1321,7 @@
   var esc2 = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   /* what each row is, in a few words, so a closed row still says something to a recruiter */
   var REEL_LBL = { maaliy: "Case study \u00b7 Accounting ERP", sadeem: "Case study \u00b7 E-commerce dashboard", dhi: "Case study \u00b7 Interior design app",
-    halan: "Internship \u00b7 Fintech", nexa: "App UI \u00b7 E-commerce", vybe: "App UI \u00b7 Events", lumiere: "Web UI \u00b7 Landing page",
+    halan: "Internship \u00b7 Fintech", nexa: "App UI \u00b7 E-commerce", vybe: "App UI \u00b7 Events", lumiere: "Web UI \u00b7 Landing page", snapchat: "App UI \u00b7 Redesign",
     "gd-2024": "Graphic design \u00b7 Collection", "social-posts": "Social media \u00b7 Campaign", traubi: "Social media \u00b7 Campaign", dalya: "Social media \u00b7 Campaign" };
   function buildReel() {
     if (reelBuilt) return;
@@ -1354,7 +1347,7 @@
       if (id === "nexa") later = true;
       if (later) li.classList.add("later");
       li.innerHTML = '<div class="awr-row"><span class="awr-n">' + ("00" + (i + 1)).slice(-3) + '</span><h3 class="awr-name"><button class="awr-toggle" type="button" aria-expanded="false" aria-controls="awr-' + id + '">' + esc2(name) + '</button><span class="awr-kind">' + esc2(REEL_LBL[id] || KIND_LBL[k]) + "</span></h3>" +
-        '<p class="awr-desc">' + esc2(desc) + '</p>' + (k === "graphic" && info.behance
+        '<p class="awr-desc">' + esc2(desc) + '</p>' + ((info.link || k === "graphic") && info.behance
           /* graphics open the project on Behance, in a new tab */
           ? '<a class="awr-btn" href="' + info.behance + '" target="_blank" rel="noopener">View project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg><span class="sr"> (opens in a new tab)</span></a>'
           : '<button class="awr-btn" type="button" data-case="' + id + '">View project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>') + '</div>' +
@@ -2038,8 +2031,8 @@
       reel: [["bf-grid", "Breadfast posts in a grid with an Instagram phone mockup: Fresh organic, a baby croissant, a cake, coffee, Nutella croissant and lunch boxes", 800, 801], ["kk-feast", "Kilo Kabab post: kebab, kofta, chicken and rice on a wooden table, Having guests? Leave it to us", 800, 800], ["bf-baby", "Breadfast post: baby croissants falling across bold white lettering on magenta, with a New product sticker", 800, 800], ["kk-moments", "Kilo Kabab post: kofta on a board on the sand beside a straw hat and a camera, Sweet moments with Kilo Kabab", 800, 800], ["bf-banner", "Breadfast banner: a tray of croissants beside fresh eggs, Try a different breakfast?", 1605, 800], ["kk-mix", "Kilo Kabab post: a mixed grill plate on a checked cloth, with steam in the shape of a heart", 800, 800], ["bf-try", "Breadfast post: croissants and eggs with hand-drawn circles and arrows, Try fresh croissants and fresh eggs", 800, 800], ["kk-wraps", "Kilo Kabab post: two hands holding shish and fillet wraps in branded boxes on orange", 800, 800], ["bf-cake", "Breadfast post: a bundt cake with its ingredients, flour, eggs, butter and milk, labelled in handwriting, Let's bake a cake", 800, 800], ["kk-lentil", "Kilo Kabab post: a cup of lentil soup steaming on a tray, with a sticky note", 800, 800], ["bf-nutella", "Breadfast post: chocolate pouring onto a croissant on magenta, Tried the new Nutella croissant?", 800, 800], ["kk-holiday", "Kilo Kabab post: kofta in a basket on a line-drawn delivery scooter in the city, The holiday is flying by", 800, 800]],
       meta: [["Project", "Breadfast and Kilo Kabab campaign"], ["Discipline", "Social media campaign"]], cover: "Campaign posts",
       sections: [{ h: "Posts", media: [["three", ["Post", "Post", "Post"]], ["three", ["Post", "Post", "Post"]]] }] },
-    /* Snapchat Spellbook (Nov 5): her illustration + UI redesign concept; "View project" opens its own page (a claude.ai artifact) */
-    { id: "snapchat", name: "Snapchat Spellbook", cat: "Playground", color: "#544AE6", link: "https://claude.ai/artifact/HAaLmcqoCzXzVsSXqmrkD6",
+    /* Snapchat Spellbook (Nov 5): her illustration + UI redesign concept. Nov 7: moved to App & web UI; "View project" opens her page p/snapchat-spellbook/ in a new tab */
+    { id: "snapchat", name: "Snapchat Spellbook", cat: "Product", color: "#544AE6", link: "p/snapchat-spellbook/",
       tags: ["Illustration", "UI redesign"], statement: "Snapchat’s logo is a ghost, so I asked: what if that ghost went to magic school? Snapchat Spellbook reimagines the app’s icons as enchanted objects: a key for location, a mirror for the camera, a message in a bottle for chat. These sit inside a cleaner interface built for the people who use it most. It’s a concept project made for fun, exploring how a pictogram system can give a familiar app a brand-new personality.",
       reel: [["screens", "The redesigned screens: camera, map, Discover, Stories, chats and Add friends, in lavender with the new pictograms", 1333, 800], ["pictograms", "21 magical pictograms on lime: key, eye, bottle, wand, mirror, tarot cards, ghost, hourglass, torch and more", 1231, 800], ["before-after", "Before and after: Snapchat's black-and-white icons beside the new violet and lime pictograms", 1454, 800], ["object-to-pictogram", "Real object plus a spell equals a pictogram: a key for Location, an evil eye for Discover, a bottle for Chat, a mirror for Camera", 1231, 800], ["camera", "The camera screen before and after, with patch notes: Camera, recast, and Four tabs", 1092, 800], ["inspiration", "Each feature as an enchanted object, with its story: Location, Discover, Chat, Camera, Multi snaps, Notifications and more", 1014, 800], ["old-icons", "Game over for black and white: the original icons, with 2 colours, 5 nav items and 0 ghost links", 1373, 800], ["audience", "Built for the people who snap the most: the audience, aged 13 to 27, what they love and what they hate", 1294, 800]],
       meta: [["Project", "Snapchat Spellbook"], ["Discipline", "Illustration and UI redesign"]], cover: "Pictograms and UI redesign",
@@ -2069,7 +2062,7 @@
     });
     if (c.coverImg) imgs.unshift(["f/" + c.id + "/" + c.coverImg[0] + ".webp", c.coverImg[1], c.coverImg[2], c.coverImg[3]]);
     if (c.reel) imgs = c.reel.map(function (it) { return ["f/" + c.id + "/" + it[0] + ".webp", it[1], it[2], it[3]]; });
-    return { imgs: imgs, labels: labels, tags: c.tags, color: c.color, behance: c.link || (c.behance ? BE + c.behance : "") };   /* link: a project page outside Behance */
+    return { imgs: imgs, labels: labels, tags: c.tags, color: c.color, behance: c.link || (c.behance ? BE + c.behance : ""), link: c.link || "" };   /* link: a project page outside Behance */
   };
 
   function esc(t) { return String(t).replace(/[&<>"]/g, function (ch) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]; }); }
@@ -2486,7 +2479,10 @@
   /* every "View project" in the site lands here */
   document.addEventListener("click", function (e) {
     var a = e.target.closest("[data-case]"); if (!a || !byId[a.getAttribute("data-case")]) return;
-    e.preventDefault(); e.stopPropagation(); open(a.getAttribute("data-case"), a);
+    e.preventDefault(); e.stopPropagation();
+    var lk = byId[a.getAttribute("data-case")].link;   /* a project with its own page (Snapchat Spellbook) opens it in a new tab */
+    if (lk) { window.open(lk, "_blank", "noopener"); return; }
+    open(a.getAttribute("data-case"), a);
   }, true);
   addEventListener("keydown", function (e) { if (e.key === "Escape" && site.getAttribute("data-mode") === "case") { close(); e.preventDefault(); } });
 })();
@@ -2873,7 +2869,8 @@
     if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) setFlip(dx < 0, false);
   }, { passive: true });
 
-  function rustle() {
+  function rustle() { return; }   /* Nov 7: no sound effects */
+  function rustleOff() {
     var a = R.ctx(); if (!a) return;
     var len = a.sampleRate * 0.5, buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
     for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(Math.sin(Math.PI * i / len), 2) * (0.6 + 0.4 * Math.random());
@@ -3637,7 +3634,8 @@
     begin(dir); animate(dir > 0 ? 1 : 0, quick); return true;
   }
   R.journalTurn = turn;
-  function rustle() {
+  function rustle() { return; }   /* Nov 7: no sound effects */
+  function rustleOff() {
     var a = R.ctx && R.ctx(); if (!a) return;
     var len = a.sampleRate * 0.45, buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
     for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(Math.sin(Math.PI * i / len), 2);
@@ -4502,6 +4500,7 @@
   });
   /* a short metallic tick, synthesised — nothing to download */
   function clink(speed) {
+    return;   /* Nov 7: no sound effects */
     if (!CFG.soundOn || !actx || reduced) return;
     var nowMs = performance.now();
     if (nowMs - lastSound < CFG.soundMinGap * (0.7 + Math.random() * 0.6)) return;

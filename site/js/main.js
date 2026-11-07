@@ -1337,8 +1337,8 @@
       if (!(info.imgs[0] && info.imgs[0][0].indexOf("/") >= 0)) tiles.push('<figure class="awr-tile cover pimg"><b>' + (cover ? cover.innerHTML : esc2(name)) + "</b><small>" + esc2(name) + "</small></figure>");
       info.imgs.slice(0, id === "gd-2024" || id === "dhi" || id === "dalya" || id === "social-posts" || id === "snapchat" ? 12 : 6).forEach(function (im) {
         /* phone screens (Halan) sit in a phone frame; boards and mock-ups (Sadeem) keep their own shape */
-        if (im[0].indexOf("/") < 0) tiles.push('<figure class="awr-tile shot"><img src="f/halan/' + im[0] + '.webp" alt="" decoding="async"></figure>');
-        else tiles.push('<figure class="awr-tile pic"' + (im[2] ? ' style="aspect-ratio:' + im[2] + "/" + im[3] + '"' : "") + '><img src="' + im[0] + '" alt="" decoding="async"></figure>');
+        if (im[0].indexOf("/") < 0) tiles.push('<figure class="awr-tile shot"><img data-src="f/halan/' + im[0] + '.webp" alt="" loading="lazy" decoding="async"></figure>');
+        else tiles.push('<figure class="awr-tile pic"' + (im[2] ? ' style="aspect-ratio:' + im[2] + "/" + im[3] + '"' : "") + '><img data-src="' + im[0] + '" alt="" loading="lazy" decoding="async"></figure>');
       });
       if (!info.imgs.length) info.labels.slice(0, 5).forEach(function (l, j) { tiles.push('<figure class="awr-tile phx pimg t' + (j % 3) + '"><span>' + esc2(l) + "</span></figure>"); });
       while (tiles.length < 4) tiles.push('<figure class="awr-tile phx pimg t' + (tiles.length % 3) + '"><span>' + esc2(info.tags[tiles.length] || KIND_LBL[k]) + "</span></figure>");
@@ -2363,7 +2363,7 @@
     h += '<a class="cs-next" href="#" data-next="' + n.id + '" style="--nph:' + n.color + '"><span class="cs-next-lbl">Next up</span><span class="cs-next-name">' + esc(n.name) + "</span>" + ARR + "</a>";
     h += "</div>";
     h += '<footer class="sky-end sky-hid" style="--from:var(--cream)" aria-label="Footer"><div class="sky-glass"><p>Sky has no limits.</p></div></footer>';
-    page.innerHTML = h;
+    page.innerHTML = h.replace(/<img (?![^>]*loading=)/g, '<img loading="lazy" ');   /* Nov 7: below-the-fold pictures load as you scroll */
     page.setAttribute("aria-label", c.name + " case study");
     if (R.editScope) R.editScope(page, "c" + c.id);
     reveal(); runAnims(); runDemos(); markPhase();
@@ -3483,11 +3483,11 @@
   /* ---------------------------------------------------------- build pages */
   var seq = [], total = P.length;
   (function build() {
-    var c = document.createElement("div"); c.className = "j-page cover"; c.innerHTML = COVER; seq.push(c);
+    var c = document.createElement("div"); c.className = "j-page cover"; c.innerHTML = COVER.replace(/<img src=/g, "<img data-src="); seq.push(c); R.journalCover = c;
     P.forEach(function (p, i) {
       var el = document.createElement("div"), side = i % 2 ? "right" : "left";
       el.className = "j-page " + side + " " + p.cls; el.setAttribute("data-p", i);
-      el.innerHTML = p.html + '<span class="j-pno">' + (i ? i : "") + "</span>" + (i < total - 1 && side === "right" ? corner(1) : "") + (side === "left" ? corner(-1) : "") + (side === "right" && i === total - 1 ? "" : "");
+      el.innerHTML = p.html.replace(/<img src=/g, "<img data-src=") + '<span class="j-pno">' + (i ? i : "") + "</span>" + (i < total - 1 && side === "right" ? corner(1) : "") + (side === "left" ? corner(-1) : "") + (side === "right" && i === total - 1 ? "" : "");
       seq.push(el);
     });
     var blank = document.createElement("div"); blank.className = "j-page left blank"; seq.blank = blank;
@@ -3927,8 +3927,10 @@
 })();
 
 
-(function () {
+/* Nov 7 (speed): the keychain starts the first time the Selected works page opens, not on page load */
+window.__kcBoot = function () {
   "use strict";
+  window.__kcBoot = null;
 
   /* =========================================================================
      TUNING — everything you are likely to want to change lives here.
@@ -4814,7 +4816,7 @@
   order.forEach(park);
   paint();
   addEventListener("load", function () { layout(); paint(); });
-})();
+};
 
 
 (function () {
@@ -5287,4 +5289,50 @@
     }).catch(function () {});
   })();
   R.__editTest = function (fake) { art = fake; if (!pill) ui(); };
+})();
+
+/* ---- Nov 7 (speed, phones first): pictures in the parts of the site that start hidden carry data-src
+   and only download when that part opens (works page, All works, journal, About sheets, contact, menu).
+   Phones never fetch what they never open, and memory stays low enough that the tab isn't reloaded. */
+(function () {
+  "use strict";
+  var R = window.R2 || {}, site = document.getElementById("site");
+  function wake(root) {
+    if (!root || !root.querySelectorAll) return;
+    root.querySelectorAll("img[data-src]").forEach(function (im) {
+      if (im.dataset.srcset) { im.srcset = im.dataset.srcset; im.removeAttribute("data-srcset"); }
+      im.src = im.dataset.src; im.removeAttribute("data-src");
+    });
+  }
+  R.wake = wake;
+  var $ = function (id) { return document.getElementById(id); };
+  function check() {
+    var m = site.getAttribute("data-mode");
+    if (site.getAttribute("data-face") === "1") wake($("worksPage"));   /* on the laptop room: the works page is one scroll away */
+    if (m === "works" || m === "all" || m === "case" || site.hasAttribute("data-dive")) { wake($("worksPage")); if (window.__kcBoot) window.__kcBoot(); }
+    if (m === "all" || ($("allWorks") && $("allWorks").classList.contains("open"))) wake($("allWorks"));
+    if (m === "contact") wake($("contactPage"));
+    var j = $("journal");
+    if (j && (j.getAttribute("aria-hidden") === "false" || j.classList.contains("open"))) {
+      wake(j); wake(R.journalCover); (R.journalPages || []).forEach(wake);
+    }
+    if (site.hasAttribute("data-sheet")) wake($("sheets"));
+    var cp = $("compass"); if (cp && !cp.hidden) wake(cp);
+  }
+  var q = 0;
+  function soon() { if (!q) q = requestAnimationFrame(function () { q = 0; check(); }); }
+  var mo = new MutationObserver(soon), opts = { attributes: true, attributeFilter: ["data-mode", "data-face", "data-dive", "data-sheet", "data-compass", "aria-hidden", "class", "hidden"] };
+  ["site", "journal", "compass", "allWorks", "sheets"].forEach(function (id) { var el = $(id); if (el) mo.observe(el, opts); });
+  /* a row of All works starts loading its strip as soon as the pointer reaches it */
+  var aw = $("allWorks");
+  if (aw) aw.addEventListener("pointerover", function (e) { var it = e.target.closest && e.target.closest(".awr-item"); if (it) it.querySelectorAll("img[loading=lazy]").forEach(function (im) { im.loading = "eager"; }); }, { passive: true });
+  check();
+  /* once the page has settled, quietly fetch the next likely stop (the works page); not on data saver or slow links */
+  var c = navigator.connection || {};
+  if (!c.saveData && !/(^|-)2g$/.test(c.effectiveType || "")) {
+    addEventListener("load", function () {
+      var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1); };
+      setTimeout(function () { idle(function () { wake($("worksPage")); }); }, 6000);
+    });
+  }
 })();

@@ -1,0 +1,24 @@
+# Cloudflare Pages caching (Nov 7). File names aren't fingerprinted, so code stays short-lived;
+# pictures, sounds and video change rarely and are kept a week, refreshed in the background.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/js/*
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+/css/*
+  Cache-Control: public, max-age=300, stale-while-revalidate=86400
+/data/*
+  Cache-Control: public, max-age=0, must-revalidate
+/a/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/f/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/l/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/i/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/keychain/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+/m/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000

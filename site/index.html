@@ -11,7 +11,10 @@
 <link rel="icon" href="f/avatar.webp" type="image/webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Almarai:wght@400;700&family=Inter:wght@400;500;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Archivo+Narrow:wght@400;500;600&family=Archivo:wght@400;500;600;800&family=Architects+Daughter&family=Homemade+Apple&family=Special+Elite&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Courier+Prime:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo+Narrow:wght@400;500;600&family=Archivo:wght@400;500;600;800&family=Architects+Daughter&family=Homemade+Apple&family=Special+Elite&display=swap">
+<!-- fonts only the case studies and the page editor use: loaded without holding up the first paint -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Inter:wght@400;500;700&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@500;600;700&family=Patrick+Hand&family=Courier+Prime:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<link rel="preload" as="image" href="a/closeup.webp" imagesrcset="a/closeup-m.webp 2160w, a/closeup.webp 3600w" imagesizes="(max-width: 760px) 719px, (pointer: coarse) 719px, 103vw" fetchpriority="high">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/videos.js"></script>
 </head>
@@ -30,8 +33,8 @@
     <div class="cp-scrim" data-cp-close></div>
     <div class="cp-wrap">
       <div class="cp-side">
-        <figure class="cp-card cp-pic"><img src="f/cp-hill.webp" alt="Rofaida's painting of herself resting on the green hill, her cat and laptop beside her" width="700" height="548" decoding="async"></figure>
-        <div class="cp-card cp-note"><p>Thank you so much for stopping by!</p><img src="f/s-cream.webp" alt="" decoding="async"></div>
+        <figure class="cp-card cp-pic"><img data-src="f/cp-hill.webp" alt="Rofaida's painting of herself resting on the green hill, her cat and laptop beside her" width="700" height="548" decoding="async"></figure>
+        <div class="cp-card cp-note"><p>Thank you so much for stopping by!</p><img data-src="f/s-cream.webp" alt="" decoding="async"></div>
       </div>
       <div class="cp-main">
         <div class="cp-card cp-menu">
@@ -69,7 +72,7 @@
   <!-- ================================================= the world: 3 rooms, 360° -->
   <main class="world" id="world" aria-roledescription="carousel" aria-label="Three rooms you can turn between: home, selected works and about me">
     <div class="w-backdrop" aria-hidden="true">
-      <div class="sky-drift"><div class="skytrack"><img src="f/sky-sketch.webp" alt=""><img class="flip" src="f/sky-sketch.webp" alt=""><img src="f/sky-sketch.webp" alt=""><img class="flip" src="f/sky-sketch.webp" alt=""></div></div>
+      <div class="sky-drift"><div class="skytrack"><img src="f/sky-sketch.webp" srcset="f/sky-sketch-m.webp 1148w, f/sky-sketch.webp 1914w" sizes="(max-width: 760px) 381px, (pointer: coarse) 381px, 134vw" alt=""><img class="flip" src="f/sky-sketch.webp" srcset="f/sky-sketch-m.webp 1148w, f/sky-sketch.webp 1914w" sizes="(max-width: 760px) 381px, (pointer: coarse) 381px, 134vw" alt=""><img src="f/sky-sketch.webp" srcset="f/sky-sketch-m.webp 1148w, f/sky-sketch.webp 1914w" sizes="(max-width: 760px) 381px, (pointer: coarse) 381px, 134vw" alt=""><img class="flip" src="f/sky-sketch.webp" srcset="f/sky-sketch-m.webp 1148w, f/sky-sketch.webp 1914w" sizes="(max-width: 760px) 381px, (pointer: coarse) 381px, 134vw" alt=""></div></div>
     </div>
     <div class="scene" id="scene">
       <div class="prism" id="prism">
@@ -78,8 +81,8 @@
         <section class="face f-home" id="home" data-i="0" aria-roledescription="slide" aria-label="Home">
           <div class="art bg">
             <div class="plate" id="plate">
-              <img class="full dayimg skyl" src="l/day-sky.webp" alt="" decoding="async">
-              <img class="full nightimg skyl" src="l/night-sky.webp" alt="" decoding="async">
+              <img class="full dayimg skyl" src="l/day-sky.webp" srcset="l/day-sky-m.webp 1650w, l/day-sky.webp 3300w" sizes="(max-width: 760px) 549px, (pointer: coarse) 549px, 158vw" alt="" decoding="async">
+              
               <div class="stars skyl" aria-hidden="true">
                 <span class="star" style="left:8%;top:14%"></span><span class="star" style="left:22%;top:30%"></span>
                 <span class="star" style="left:41%;top:9%"></span><span class="star" style="left:55%;top:24%"></span>
@@ -88,31 +91,29 @@
                 <span class="star" style="left:33%;top:19%"></span><span class="star" style="left:72%;top:5%"></span>
               </div>
               <div class="cloudloop cloudl" aria-hidden="true">
-                <div class="cloudtrack far dayimg"><img src="l/day-clouds-far.webp" alt=""><img src="l/day-clouds-far.webp" alt=""></div>
-                <div class="cloudtrack far nightimg"><img src="l/night-clouds-far.webp" alt=""><img src="l/night-clouds-far.webp" alt=""></div>
-                <div class="cloudtrack dayimg"><img src="l/day-clouds-near.webp" alt=""><img src="l/day-clouds-near.webp" alt=""></div>
-                <div class="cloudtrack nightimg"><img src="l/night-clouds-near.webp" alt=""><img src="l/night-clouds-near.webp" alt=""></div>
-              </div>
-              <img class="full dayimg" src="l/day-land.webp" fetchpriority="high" decoding="async" alt="Painted scene: Rofaida lying on a grassy hillside above the sea with her eyes closed, a grey cat beside her, headphones, a laptop and an open notebook in the grass.">
-              <img class="full nightimg" src="l/night-land.webp" alt="" decoding="async">
-              <div class="catpart her-head" id="herHead" aria-hidden="true"><img class="dayimg" src="l/day-herhead.webp" alt=""><img class="nightimg" src="l/night-herhead.webp" alt=""></div>
+                <div class="cloudtrack far dayimg"><img src="l/day-clouds-far.webp" srcset="l/day-clouds-far-m.webp 2427w, l/day-clouds-far.webp 4854w" sizes="(max-width: 760px) 808px, (pointer: coarse) 808px, 233vw" alt=""><img src="l/day-clouds-far.webp" srcset="l/day-clouds-far-m.webp 2427w, l/day-clouds-far.webp 4854w" sizes="(max-width: 760px) 808px, (pointer: coarse) 808px, 233vw" alt=""></div>
+                <div class="cloudtrack dayimg"><img src="l/day-clouds-near.webp" srcset="l/day-clouds-near-m.webp 2427w, l/day-clouds-near.webp 4854w" sizes="(max-width: 760px) 808px, (pointer: coarse) 808px, 233vw" alt=""><img src="l/day-clouds-near.webp" srcset="l/day-clouds-near-m.webp 2427w, l/day-clouds-near.webp 4854w" sizes="(max-width: 760px) 808px, (pointer: coarse) 808px, 233vw" alt=""></div>
+                </div>
+              <img class="full dayimg" src="l/day-land.webp" srcset="l/day-land-m.webp 3960w, l/day-land.webp 6600w" sizes="(max-width: 760px) 1319px, (pointer: coarse) 1319px, 158vw" fetchpriority="high" decoding="async" alt="Painted scene: Rofaida lying on a grassy hillside above the sea with her eyes closed, a grey cat beside her, headphones, a laptop and an open notebook in the grass.">
+              
+              <div class="catpart her-head" id="herHead" aria-hidden="true"><img class="dayimg" src="l/day-herhead.webp" alt=""></div>
               <div class="spots" id="spots">
-                <a class="spot" href="#about" data-spot="notebook" data-go="about" aria-label="The notebook: open About me" style="left:72.455%;top:79.818%;width:10.818%;height:14.364%;--hit:polygon(0.0% 74.7%,8.7% 81.0%,11.2% 81.0%,18.2% 85.4%,22.4% 85.4%,24.4% 88.6%,34.5% 96.8%,39.5% 95.6%,44.8% 96.8%,47.9% 93.7%,48.5% 89.9%,49.3% 95.6%,50.7% 96.8%,56.0% 97.5%,57.4% 96.2%,58.3% 92.4%,58.8% 96.8%,60.8% 98.7%,76.5% 99.4%,87.1% 71.5%,87.4% 69.0%,89.9% 63.3%,91.3% 56.3%,98.0% 38.0%,99.7% 31.0%,99.7% 22.8%,98.6% 21.5%,96.9% 22.2%,95.5% 16.5%,93.0% 13.3%,85.2% 12.0%,82.4% 10.1%,77.6% 10.8%,75.1% 6.3%,70.9% 12.7%,68.3% 12.0%,61.3% 17.1%,57.1% 9.5%,49.9% 3.2%,42.0% 0.0%,32.2% 0.0%,18.5% 24.1%,16.5% 25.3%,15.7% 29.7%,4.2% 51.9%,3.9% 60.1%,0.0% 66.5%)"><img class="cut dayimg" src="l/day-cut-notebook.webp" alt=""><img class="cut nightimg" src="l/night-cut-notebook.webp" alt=""><span class="hit"></span><b>About me</b></a>
-                <a class="spot" href="#works" data-spot="laptop" data-go="works" aria-label="The laptop: open Selected works" style="left:80.909%;top:59.364%;width:9.152%;height:20.091%;--hit:polygon(99.7% 0.0%,95.0% 0.0%,56.3% 26.2%,55.0% 28.5%,51.3% 45.2%,47.0% 43.9%,43.4% 44.3%,5.6% 71.0%,0.0% 76.0%,0.0% 82.4%,7.9% 86.0%,13.2% 85.1%,39.4% 95.9%,40.1% 99.5%,49.7% 99.5%,52.6% 96.8%,54.6% 98.2%,58.9% 95.0%,60.6% 92.8%,61.9% 87.3%,68.9% 80.1%,70.9% 80.1%,78.8% 71.0%,82.5% 70.6%,87.1% 65.2%,89.4% 60.6%,91.1% 52.0%,92.1% 50.2%,99.7% 10.4%)"><img class="cut dayimg" src="l/day-cut-laptop.webp" alt=""><img class="cut nightimg" src="l/night-cut-laptop.webp" alt=""><span class="hit"></span><b>Selected works</b></a>
-                <a class="spot" href="#contact" data-spot="headphones" data-go="contact" aria-label="The headphones: open Contact" style="left:71.636%;top:54.455%;width:4.455%;height:9.273%;--hit:polygon(0.0% 33.3%,0.0% 61.8%,3.4% 71.6%,7.5% 77.5%,38.8% 99.0%,58.5% 99.0%,62.6% 97.1%,66.0% 92.2%,71.4% 76.5%,72.1% 67.6%,85.0% 74.5%,88.4% 71.6%,91.8% 63.7%,98.0% 61.8%,99.3% 58.8%,99.3% 27.5%,94.6% 13.7%,88.4% 5.9%,82.3% 2.9%,75.5% 3.9%,68.7% 0.0%,36.7% 0.0%,14.3% 12.7%,7.5% 19.6%)"><img class="cut dayimg" src="l/day-cut-headphones.webp" alt=""><img class="cut nightimg" src="l/night-cut-headphones.webp" alt=""><span class="hit"></span><b>Let&rsquo;s talk</b></a>
-                <a class="spot" href="#home" data-spot="cat" data-meow="grey" aria-label="The cat: say hi (meow)" style="left:58.788%;top:56.545%;width:5.818%;height:19.727%;--hit:polygon(61.5% 0.0%,58.3% 4.1%,55.7% 12.9%,56.2% 16.6%,58.9% 18.0%,57.3% 21.2%,57.3% 28.6%,58.3% 30.0%,57.3% 33.6%,53.1% 37.8%,42.7% 41.9%,41.1% 44.2%,33.9% 49.3%,28.1% 59.0%,27.6% 62.7%,25.5% 64.1%,24.0% 76.0%,19.3% 73.7%,16.7% 68.2%,17.7% 58.1%,20.3% 54.4%,20.3% 45.2%,18.8% 40.6%,10.9% 33.2%,3.6% 32.7%,0.0% 35.0%,0.0% 41.5%,6.2% 47.0%,5.2% 53.5%,1.6% 62.2%,1.6% 68.7%,4.2% 76.0%,12.0% 83.4%,16.7% 86.2%,22.4% 86.6%,25.0% 88.9%,29.7% 89.9%,32.8% 92.6%,36.5% 93.1%,43.2% 98.2%,47.4% 98.2%,49.0% 94.9%,51.6% 96.8%,54.2% 95.9%,56.8% 97.2%,60.4% 96.8%,64.1% 94.5%,65.6% 91.7%,69.3% 98.2%,71.4% 99.5%,85.9% 99.5%,88.5% 96.8%,89.6% 90.8%,86.5% 87.6%,87.0% 82.0%,92.2% 65.9%,97.4% 55.3%,97.4% 43.8%,95.3% 37.8%,96.4% 36.4%,95.8% 34.1%,99.5% 29.0%,99.5% 18.4%,97.9% 17.1%,99.0% 15.7%,97.9% 1.4%,96.9% 0.0%,91.7% 0.0%,83.3% 6.5%,74.5% 7.4%,65.1% 0.0%)"><img class="cut dayimg" src="l/day-cut-cat.webp" alt=""><img class="cut nightimg" src="l/night-cut-cat.webp" alt=""><span class="catpart cat-tail" id="catTail" style="left:0.896%;top:34.468%;width:31.934%;height:52.232%"><img class="dayimg" src="l/day-cat-tail.webp" alt=""><img class="nightimg" src="l/night-cat-tail.webp" alt=""></span><span class="catpart cat-hip" style="left:20.249%;top:64.436%;width:20.316%;height:27.399%"><img class="dayimg" src="l/day-cat-hip.webp" alt=""><img class="nightimg" src="l/night-cat-hip.webp" alt=""></span><span class="catpart cat-head" id="catHead" style="left:56.771%;top:-0.459%;width:54.168%;height:37.789%"><img class="dayimg" src="l/day-cat-head.webp" alt=""><img class="nightimg" src="l/night-cat-head.webp" alt=""></span><span class="hit"></span><b>Say hi</b></a>
+                <a class="spot" href="#about" data-spot="notebook" data-go="about" aria-label="The notebook: open About me" style="left:72.455%;top:79.818%;width:10.818%;height:14.364%;--hit:polygon(0.0% 74.7%,8.7% 81.0%,11.2% 81.0%,18.2% 85.4%,22.4% 85.4%,24.4% 88.6%,34.5% 96.8%,39.5% 95.6%,44.8% 96.8%,47.9% 93.7%,48.5% 89.9%,49.3% 95.6%,50.7% 96.8%,56.0% 97.5%,57.4% 96.2%,58.3% 92.4%,58.8% 96.8%,60.8% 98.7%,76.5% 99.4%,87.1% 71.5%,87.4% 69.0%,89.9% 63.3%,91.3% 56.3%,98.0% 38.0%,99.7% 31.0%,99.7% 22.8%,98.6% 21.5%,96.9% 22.2%,95.5% 16.5%,93.0% 13.3%,85.2% 12.0%,82.4% 10.1%,77.6% 10.8%,75.1% 6.3%,70.9% 12.7%,68.3% 12.0%,61.3% 17.1%,57.1% 9.5%,49.9% 3.2%,42.0% 0.0%,32.2% 0.0%,18.5% 24.1%,16.5% 25.3%,15.7% 29.7%,4.2% 51.9%,3.9% 60.1%,0.0% 66.5%)"><img class="cut dayimg" src="l/day-cut-notebook.webp" alt=""><span class="hit"></span><b>About me</b></a>
+                <a class="spot" href="#works" data-spot="laptop" data-go="works" aria-label="The laptop: open Selected works" style="left:80.909%;top:59.364%;width:9.152%;height:20.091%;--hit:polygon(99.7% 0.0%,95.0% 0.0%,56.3% 26.2%,55.0% 28.5%,51.3% 45.2%,47.0% 43.9%,43.4% 44.3%,5.6% 71.0%,0.0% 76.0%,0.0% 82.4%,7.9% 86.0%,13.2% 85.1%,39.4% 95.9%,40.1% 99.5%,49.7% 99.5%,52.6% 96.8%,54.6% 98.2%,58.9% 95.0%,60.6% 92.8%,61.9% 87.3%,68.9% 80.1%,70.9% 80.1%,78.8% 71.0%,82.5% 70.6%,87.1% 65.2%,89.4% 60.6%,91.1% 52.0%,92.1% 50.2%,99.7% 10.4%)"><img class="cut dayimg" src="l/day-cut-laptop.webp" alt=""><span class="hit"></span><b>Selected works</b></a>
+                <a class="spot" href="#contact" data-spot="headphones" data-go="contact" aria-label="The headphones: open Contact" style="left:71.636%;top:54.455%;width:4.455%;height:9.273%;--hit:polygon(0.0% 33.3%,0.0% 61.8%,3.4% 71.6%,7.5% 77.5%,38.8% 99.0%,58.5% 99.0%,62.6% 97.1%,66.0% 92.2%,71.4% 76.5%,72.1% 67.6%,85.0% 74.5%,88.4% 71.6%,91.8% 63.7%,98.0% 61.8%,99.3% 58.8%,99.3% 27.5%,94.6% 13.7%,88.4% 5.9%,82.3% 2.9%,75.5% 3.9%,68.7% 0.0%,36.7% 0.0%,14.3% 12.7%,7.5% 19.6%)"><img class="cut dayimg" src="l/day-cut-headphones.webp" alt=""><span class="hit"></span><b>Let&rsquo;s talk</b></a>
+                <a class="spot" href="#home" data-spot="cat" data-meow="grey" aria-label="The cat: say hi (meow)" style="left:58.788%;top:56.545%;width:5.818%;height:19.727%;--hit:polygon(61.5% 0.0%,58.3% 4.1%,55.7% 12.9%,56.2% 16.6%,58.9% 18.0%,57.3% 21.2%,57.3% 28.6%,58.3% 30.0%,57.3% 33.6%,53.1% 37.8%,42.7% 41.9%,41.1% 44.2%,33.9% 49.3%,28.1% 59.0%,27.6% 62.7%,25.5% 64.1%,24.0% 76.0%,19.3% 73.7%,16.7% 68.2%,17.7% 58.1%,20.3% 54.4%,20.3% 45.2%,18.8% 40.6%,10.9% 33.2%,3.6% 32.7%,0.0% 35.0%,0.0% 41.5%,6.2% 47.0%,5.2% 53.5%,1.6% 62.2%,1.6% 68.7%,4.2% 76.0%,12.0% 83.4%,16.7% 86.2%,22.4% 86.6%,25.0% 88.9%,29.7% 89.9%,32.8% 92.6%,36.5% 93.1%,43.2% 98.2%,47.4% 98.2%,49.0% 94.9%,51.6% 96.8%,54.2% 95.9%,56.8% 97.2%,60.4% 96.8%,64.1% 94.5%,65.6% 91.7%,69.3% 98.2%,71.4% 99.5%,85.9% 99.5%,88.5% 96.8%,89.6% 90.8%,86.5% 87.6%,87.0% 82.0%,92.2% 65.9%,97.4% 55.3%,97.4% 43.8%,95.3% 37.8%,96.4% 36.4%,95.8% 34.1%,99.5% 29.0%,99.5% 18.4%,97.9% 17.1%,99.0% 15.7%,97.9% 1.4%,96.9% 0.0%,91.7% 0.0%,83.3% 6.5%,74.5% 7.4%,65.1% 0.0%)"><img class="cut dayimg" src="l/day-cut-cat.webp" alt=""><span class="catpart cat-tail" id="catTail" style="left:0.896%;top:34.468%;width:31.934%;height:52.232%"><img class="dayimg" src="l/day-cat-tail.webp" alt=""></span><span class="catpart cat-hip" style="left:20.249%;top:64.436%;width:20.316%;height:27.399%"><img class="dayimg" src="l/day-cat-hip.webp" alt=""></span><span class="catpart cat-head" id="catHead" style="left:56.771%;top:-0.459%;width:54.168%;height:37.789%"><img class="dayimg" src="l/day-cat-head.webp" alt=""></span><span class="hit"></span><b>Say hi</b></a>
               </div>
               <img class="full softl" id="wideSoft" src="a/wide-soft.webp" alt="" decoding="async" aria-hidden="true">
             </div>
           </div>
           <!-- the opening shot: close on her face; scrolling pulls the camera back to the hill -->
-          <div class="intro-backdrop" id="introBackdrop" aria-hidden="true"><img src="a/wide.webp" alt="" decoding="async"></div>
+          <div class="intro-backdrop" id="introBackdrop" aria-hidden="true"><img src="a/wide.webp" srcset="a/wide-m.webp 1980w, a/wide.webp 3300w" sizes="(max-width: 760px) 659px, (pointer: coarse) 659px, 112vw" alt="" decoding="async"></div>
           <div class="close-plate" id="closePlate" aria-hidden="true"><div class="inner">
-            <img class="full dayimg" src="a/closeup.webp" alt="" fetchpriority="high" decoding="async">
-            <img class="full nightimg" src="a/closeup-night.webp" alt="" decoding="async">
+            <img class="full dayimg" src="a/closeup.webp" srcset="a/closeup-m.webp 2160w, a/closeup.webp 3600w" sizes="(max-width: 760px) 719px, (pointer: coarse) 719px, 103vw" alt="" fetchpriority="high" decoding="async">
+            
             <img class="full softl" id="closeSoft" src="a/closeup-soft.webp" alt="" decoding="async">
             <img class="full ghost dayimg" src="a/closeup-glow.webp" alt="" decoding="async">
-            <img class="full ghost nightimg" src="a/closeup-night.webp" alt="" decoding="async">
+            
           </div></div>
           <div class="intro-vig" id="introVig" aria-hidden="true"></div>
           <div class="intro-grain" aria-hidden="true"></div>
@@ -142,11 +143,11 @@
         <!-- ---------------------------------------------- 1 · selected works -->
         <section class="face f-works" id="works" data-i="1" aria-roledescription="slide" aria-label="Selected works">
           <div class="zoomer" id="zoomer">
-          <div class="art bg"><img class="bgimg" src="a/works-bg.webp" alt="A laptop resting in a sunlit wildflower meadow above the sea" decoding="async" style="left:calc(-86.24 * var(--k));top:calc(-287.89 * var(--k));width:calc(2414.79 * var(--k));height:calc(1430.49 * var(--k))">
-            <div class="skyband" aria-hidden="true" style="left:calc(-86.24 * var(--k));top:calc(-287.89 * var(--k));width:calc(2414.79 * var(--k));height:calc(963.54 * var(--k))"><div class="sb-track"><img src="a/works-skyband.webp" alt=""><img class="flip" src="a/works-skyband.webp" alt=""><img src="a/works-skyband.webp" alt=""><img class="flip" src="a/works-skyband.webp" alt=""></div></div>
+          <div class="art bg"><img class="bgimg" src="a/works-bg.webp" srcset="a/works-bg-m.webp 1955w, a/works-bg.webp 3258w" sizes="(max-width: 760px) 650px, (pointer: coarse) 650px, 135vw" alt="A laptop resting in a sunlit wildflower meadow above the sea" decoding="async" style="left:calc(-86.24 * var(--k));top:calc(-287.89 * var(--k));width:calc(2414.79 * var(--k));height:calc(1430.49 * var(--k))">
+            <div class="skyband" aria-hidden="true" style="left:calc(-86.24 * var(--k));top:calc(-287.89 * var(--k));width:calc(2414.79 * var(--k));height:calc(963.54 * var(--k))"><div class="sb-track"><img src="a/works-skyband.webp" srcset="a/works-skyband-m.webp 1629w, a/works-skyband.webp 3258w" sizes="(max-width: 760px) 542px, (pointer: coarse) 542px, 135vw" alt=""><img class="flip" src="a/works-skyband.webp" srcset="a/works-skyband-m.webp 1629w, a/works-skyband.webp 3258w" sizes="(max-width: 760px) 542px, (pointer: coarse) 542px, 135vw" alt=""><img src="a/works-skyband.webp" srcset="a/works-skyband-m.webp 1629w, a/works-skyband.webp 3258w" sizes="(max-width: 760px) 542px, (pointer: coarse) 542px, 135vw" alt=""><img class="flip" src="a/works-skyband.webp" srcset="a/works-skyband-m.webp 1629w, a/works-skyband.webp 3258w" sizes="(max-width: 760px) 542px, (pointer: coarse) 542px, 135vw" alt=""></div></div>
           </div>
           <h2 class="mega works-title">Selected<br>works</h2>
-          <div class="art wfg" aria-hidden="true"><img class="cutout" src="a/works-fg.webp" alt="" style="left:calc(-86.24 * var(--k));top:calc(425.13 * var(--k));width:calc(2414.79 * var(--k));height:calc(717.47 * var(--k))"></div>
+          <div class="art wfg" aria-hidden="true"><img class="cutout" src="a/works-fg.webp" srcset="a/works-fg-m.webp 1955w, a/works-fg.webp 3258w" sizes="(max-width: 760px) 650px, (pointer: coarse) 650px, 135vw" alt="" style="left:calc(-86.24 * var(--k));top:calc(425.13 * var(--k));width:calc(2414.79 * var(--k));height:calc(717.47 * var(--k))"></div>
           <div class="art fx">
             <svg class="screen" id="screen" viewBox="0 0 1921 1117" preserveAspectRatio="none" aria-hidden="true">
               <defs><filter id="bloom" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="18"/></filter></defs>
@@ -161,10 +162,10 @@
 
         <!-- ------------------------------------------------------- 2 · about -->
         <section class="face f-about" id="about" data-i="2" aria-roledescription="slide" aria-label="About me">
-          <div class="art bg"><img class="bgimg" id="aboutBg" src="a/about-bg.webp" alt="An open notebook lying in a sunlit meadow of daisies, next to an iced matcha" decoding="async" style="left:calc(1.13 * var(--k));top:calc(0 * var(--k));width:calc(1922.1 * var(--k));height:calc(1116.36 * var(--k))"></div>
+          <div class="art bg"><img class="bgimg" id="aboutBg" src="a/about-bg.webp" srcset="a/about-bg-m.webp 1975w, a/about-bg.webp 3292w" sizes="(max-width: 760px) 657px, (pointer: coarse) 657px, 108vw" alt="An open notebook lying in a sunlit meadow of daisies, next to an iced matcha" decoding="async" style="left:calc(1.13 * var(--k));top:calc(0 * var(--k));width:calc(1922.1 * var(--k));height:calc(1116.36 * var(--k))"></div>
           <h2 class="mega about-title">About<br>me</h2>
           <div class="art fg">
-            <img class="cutout" src="a/about-notebook.webp" alt="" aria-hidden="true" style="left:calc(581.50 * var(--k));top:calc(348.57 * var(--k));width:calc(1090.67 * var(--k));height:calc(729.26 * var(--k))">
+            <img class="cutout" src="a/about-notebook.webp" srcset="a/about-notebook-m.webp 1308w, a/about-notebook.webp 1868w" sizes="(max-width: 760px) 435px, (pointer: coarse) 435px, 61vw" alt="" aria-hidden="true" style="left:calc(581.50 * var(--k));top:calc(348.57 * var(--k));width:calc(1090.67 * var(--k));height:calc(729.26 * var(--k))">
             <img class="cutout cup-shadow" src="a/about-cup-shadow.webp" alt="" aria-hidden="true" style="left:calc(1262.64 * var(--k));top:calc(410.69 * var(--k));width:calc(490.22 * var(--k));height:calc(245.11 * var(--k))">
             <img class="cutout cup" id="cup" src="a/about-cup.webp" alt="" aria-hidden="true" style="left:calc(1280.80 * var(--k));top:calc(120.19 * var(--k));width:calc(254.19 * var(--k));height:calc(387.16 * var(--k))">
             <img class="cutout cup-grass" src="a/about-cup-grass.webp" alt="" aria-hidden="true" style="left:calc(1335.27 * var(--k));top:calc(410.69 * var(--k));width:calc(217.88 * var(--k));height:calc(118.02 * var(--k))">
@@ -223,10 +224,10 @@
           </header>
           <div class="p-body">
             <div class="p-copy"><div><p>Accountants were losing tax deadlines in a system that had everything and showed nothing. I rebuilt it around the client instead of the operation.</p><ul class="p-facts"><li>Entries, invoices and taxes merged into one client view</li><li>A summary row that opens into the full client page</li><li>A deadlines calendar with alerts, the top pain in interviews</li><li>One RTL design system across 14+ screens and 7 roles</li></ul></div><button class="p-link" type="button" data-case="maaliy">View case study <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button></div>
-            <figure class="pimg main has-img"><img src="f/works/maaliy-main.webp" alt="Maaliy's dashboard on a tablet: KPIs, revenue trend and the follow-up worklist" width="1600" height="1212" loading="lazy" decoding="async"></figure>
+            <figure class="pimg main has-img"><img data-src="f/works/maaliy-main.webp" alt="Maaliy's dashboard on a tablet: KPIs, revenue trend and the follow-up worklist" width="1600" height="1212" loading="lazy" decoding="async"></figure>
             <div class="p-side">
-              <figure class="pimg has-img"><img src="f/works/maaliy-d1.webp" alt="Maaliy's dashboard on a laptop" width="1200" height="909" loading="lazy" decoding="async"></figure>
-              <figure class="pimg has-img"><img src="f/works/maaliy-d2.webp" alt="Two accountants working with Maaliy in an office" width="1200" height="909" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img data-src="f/works/maaliy-d1.webp" alt="Maaliy's dashboard on a laptop" width="1200" height="909" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img data-src="f/works/maaliy-d2.webp" alt="Two accountants working with Maaliy in an office" width="1200" height="909" loading="lazy" decoding="async"></figure>
             </div>
           </div>
         </div>
@@ -243,10 +244,10 @@
           </header>
           <div class="p-body">
             <div class="p-copy"><div><p>A single-vendor store dashboard for shop owners who think in Arabic. It reads right to left from the first pixel, not as a mirrored afterthought.</p><ul class="p-facts"><li>State before value: stock is a badge, payment and fulfilment are two states</li><li>A permission matrix of 8 areas &times; 5 actions replaced a wall of checkboxes</li><li>Swappable cards, so owners choose what stays on screen</li><li>33 primitives and 84 semantic tokens across 13 screens</li></ul></div><button class="p-link" type="button" data-case="sadeem">View case study <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button></div>
-            <figure class="pimg main has-img"><img src="f/works/sadeem-main.webp" alt="Sadeem's products table on a monitor, in purple clouds" width="1600" height="1000" loading="lazy" decoding="async"></figure>
+            <figure class="pimg main has-img"><img data-src="f/works/sadeem-main.webp" alt="Sadeem's products table on a monitor, in purple clouds" width="1600" height="1000" loading="lazy" decoding="async"></figure>
             <div class="p-side">
-              <figure class="pimg has-img"><img src="f/works/sadeem-d1.webp" alt="Editing a product in Sadeem on a laptop" width="1200" height="750" loading="lazy" decoding="async"></figure>
-              <figure class="pimg has-img"><img src="f/works/sadeem-d2.webp" alt="Sadeem's categories on a desktop monitor" width="1200" height="750" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img data-src="f/works/sadeem-d1.webp" alt="Editing a product in Sadeem on a laptop" width="1200" height="750" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img data-src="f/works/sadeem-d2.webp" alt="Sadeem's categories on a desktop monitor" width="1200" height="750" loading="lazy" decoding="async"></figure>
             </div>
           </div>
         </div>
@@ -263,10 +264,10 @@
           </header>
           <div class="p-body">
             <div class="p-copy"><div><p>An interior design platform for homes in Saudi Arabia. Competitor apps split consultation, shopping and tracking; Dhi keeps them in one place.</p><ul class="p-facts"><li>A style quiz that gets people to a direction fast</li><li>In-app project chat with the designer, fewer phone calls</li><li>40+ screens on an Arabic RTL design system</li></ul></div><button class="p-link" type="button" data-case="dhi">View case study <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button></div>
-            <figure class="pimg main has-img"><img src="f/works/dhi-main.webp" alt="Three Dhi screens on phones over deep green: the shop, the home screen and the consultation packages" width="1600" height="1000" loading="lazy" decoding="async"></figure>
+            <figure class="pimg main has-img"><img data-src="f/works/dhi-main.webp" alt="Three Dhi screens on phones over deep green: the shop, the home screen and the consultation packages" width="1600" height="1000" loading="lazy" decoding="async"></figure>
             <div class="p-side">
-              <figure class="pimg has-img"><img src="f/works/dhi-d1.webp" alt="Two Dhi screens: choosing rooms for a booking, and tracking a project step by step" width="1200" height="750" loading="lazy" decoding="async"></figure>
-              <figure class="pimg has-img"><img src="f/works/dhi-d2.webp" alt="Two Dhi screens: a product page with payment options, and the cart" width="1200" height="750" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img data-src="f/works/dhi-d1.webp" alt="Two Dhi screens: choosing rooms for a booking, and tracking a project step by step" width="1200" height="750" loading="lazy" decoding="async"></figure>
+              <figure class="pimg has-img"><img data-src="f/works/dhi-d2.webp" alt="Two Dhi screens: a product page with payment options, and the cart" width="1200" height="750" loading="lazy" decoding="async"></figure>
             </div>
           </div>
         </div>
@@ -277,10 +278,10 @@
 
     <!-- the keyring, on the sky, after the projects (Figma 332:4851) -->
     <section class="peek kc" id="play" aria-label="A sneak peek at my mind">
-      <div class="peek-sky sky-drift" aria-hidden="true"><div class="skytrack"><img src="f/sky-sketch.webp" alt="" loading="eager" decoding="async"><img class="flip" src="f/sky-sketch.webp" alt="" loading="eager" decoding="async"></div></div>
+      <div class="peek-sky sky-drift" aria-hidden="true"><div class="skytrack"><img data-src="f/sky-sketch.webp" data-srcset="f/sky-sketch-m.webp 1148w, f/sky-sketch.webp 1914w" sizes="(max-width: 760px) 381px, (pointer: coarse) 381px, 134vw" alt="" loading="eager" decoding="async"><img class="flip" data-src="f/sky-sketch.webp" data-srcset="f/sky-sketch-m.webp 1148w, f/sky-sketch.webp 1914w" sizes="(max-width: 760px) 381px, (pointer: coarse) 381px, 134vw" alt="" loading="eager" decoding="async"></div></div>
       <div class="frame">
         <div class="sheet" id="sheet">
-          <div class="clip"><img class="peek-grid" src="f/grid.webp" alt="" aria-hidden="true" loading="lazy"></div>
+          <div class="clip"><img class="peek-grid" data-src="f/grid.webp" alt="" aria-hidden="true" loading="lazy"></div>
           <h2 class="peek-title">a sneak peek<br>at my mind</h2>
           <p class="peek-note l">Visual roots, product mindset. Five years of exploring Applied Arts, branding, and visual communication, followed by hands-on experience in digital product design.</p>
           <p class="peek-note r">From pixels to prototypes. Figma, Adobe, Framer, and AI tools each bringing a different part of the process to life.</p>
@@ -289,7 +290,7 @@
               <div class="kc-scaler" id="kcScaler">
                 <canvas id="kcChains"></canvas>
                 <div class="kc-layer" id="kcStills"></div>
-                <div class="kc-hub" id="kcHub"><img src="keychain/k/hub.webp" alt="" decoding="async"></div>
+                <div class="kc-hub" id="kcHub"><img data-src="keychain/k/hub.webp" alt="" decoding="async"></div>
                 <div class="kc-layer" id="kcParts"></div>
                 <div class="kc-layer" id="kcKbds" style="pointer-events:auto"></div>
               </div>
@@ -469,7 +470,7 @@
           <li class="now" data-job="halan"><span class="jr-dot" aria-hidden="true"></span><button class="jr-pick" type="button" aria-pressed="false" aria-controls="jrDetail"><span class="jr-when">Jul 2026 &ndash; now</span><b class="jr-role">Product designer intern</b><span class="jr-where">MNT-Halan</span></button></li>
         </ol>
         <aside class="jr-detail" id="jrDetail" aria-live="polite"></aside>
-        <figure class="pola jr-pola" aria-hidden="true"><span class="tape" ></span><img src="f/p-wall.webp" alt=""><figcaption>still learning</figcaption></figure>
+        <figure class="pola jr-pola" aria-hidden="true"><span class="tape" ></span><img data-src="f/p-wall.webp" alt=""><figcaption>still learning</figcaption></figure>
         <button class="turn back" id="turnBack" type="button" aria-label="Turn the page back"><span class="curl" aria-hidden="true"></span><span class="turn-l">turn back</span></button>
       </div></div>
       <div class="leaf" id="leaf">
@@ -478,10 +479,10 @@
         <h2 class="ab-title" id="ab-title">A little<br>about me</h2>
         <p class="ab-copy" id="abCopy">A designer who likes turning little ideas into things people can feel.<br> I&rsquo;m Rofaida a Product Designer with a Graphic Design background, curious about people, obsessed with details, and always looking for the little spark that makes an experience feel special.</p>
         <p class="ab-why" aria-hidden="true">Always asking<br>Why<span class="q">?</span></p>
-        <img class="sticker cream" tabindex="0" src="f/s-cream.webp" alt="Sticker: a cream cat with blue eyes. Drag it around." draggable="false" style="left:calc(58.3 * var(--s));top:calc(382.1 * var(--s));width:calc(159.1 * var(--s));height:calc(171.2 * var(--s))">
-        <img class="sticker black" tabindex="0" src="f/s-black.webp" alt="Sticker: a grumpy black cat. Drag it around." draggable="false" style="left:calc(118.3 * var(--s));top:calc(451.8 * var(--s));width:calc(172.7 * var(--s));height:calc(186 * var(--s))">
-        <img class="sticker orange" src="f/s-orange.webp" alt="Sticker: a ginger cat with a question mark" draggable="false" style="left:calc(1143 * var(--s));top:calc(439.3 * var(--s));width:calc(175 * var(--s));height:calc(162 * var(--s))">
-        <img class="sticker white" tabindex="0" src="f/s-white.webp" alt="Sticker: a fluffy white and black cat. Drag it around." draggable="false" style="left:calc(1172.4 * var(--s));top:calc(101.9 * var(--s));width:calc(158.5 * var(--s));height:calc(137.5 * var(--s))">
+        <img class="sticker cream" tabindex="0" data-src="f/s-cream.webp" alt="Sticker: a cream cat with blue eyes. Drag it around." draggable="false" style="left:calc(58.3 * var(--s));top:calc(382.1 * var(--s));width:calc(159.1 * var(--s));height:calc(171.2 * var(--s))">
+        <img class="sticker black" tabindex="0" data-src="f/s-black.webp" alt="Sticker: a grumpy black cat. Drag it around." draggable="false" style="left:calc(118.3 * var(--s));top:calc(451.8 * var(--s));width:calc(172.7 * var(--s));height:calc(186 * var(--s))">
+        <img class="sticker orange" data-src="f/s-orange.webp" alt="Sticker: a ginger cat with a question mark" draggable="false" style="left:calc(1143 * var(--s));top:calc(439.3 * var(--s));width:calc(175 * var(--s));height:calc(162 * var(--s))">
+        <img class="sticker white" tabindex="0" data-src="f/s-white.webp" alt="Sticker: a fluffy white and black cat. Drag it around." draggable="false" style="left:calc(1172.4 * var(--s));top:calc(101.9 * var(--s));width:calc(158.5 * var(--s));height:calc(137.5 * var(--s))">
         <button class="turn" id="turnBtn" type="button" aria-label="Turn the page to see my work journey"><span class="curl" aria-hidden="true"></span><span class="turn-l">turn the page</span></button>
       </div></div>
         <div class="leaf-rev" aria-hidden="true"><div class="paper"></div></div>
@@ -494,26 +495,26 @@
     <div class="nb-sheet pixels" id="sheetPixels" role="dialog" aria-modal="true" aria-labelledby="px-title" tabindex="-1" data-w="1328.03" data-h="828.06">
       <div class="side"><div class="paper nb-in" id="pxCanvas">
         <h2 class="px-title" id="px-title"><span class="a">Beyond the</span> <span class="b" id="pxWord">Pixels</span></h2>
-        <figure class="ph" tabindex="0" data-n="salad-bowls.jpg" style="left:calc(104.2 * var(--s));top:calc(44 * var(--s));width:calc(178.6 * var(--s));height:calc(133.9 * var(--s))"><img src="f/p-bowls.webp" alt="Three wooden bowls of salad with green dressing"></figure>
-        <figure class="ph" tabindex="0" data-n="manama.jpg" style="left:calc(955.5 * var(--s));top:calc(59.7 * var(--s));width:calc(119 * var(--s));height:calc(158.7 * var(--s))"><img src="f/p-bahrain.webp" alt="Rofaida on a boat with a city skyline behind her"></figure>
-        <figure class="ph" tabindex="0" data-n="makkah.jpg" style="left:calc(1059.1 * var(--s));top:calc(83.4 * var(--s));width:calc(111.4 * var(--s));height:calc(128.3 * var(--s))"><img src="f/p-makkah.webp" alt="A street in Makkah at night"></figure>
-        <figure class="ph" tabindex="0" data-n="beach-night.jpg" style="left:calc(992.8 * var(--s));top:calc(206 * var(--s));width:calc(190 * var(--s));height:calc(122.7 * var(--s))"><img src="f/p-scarf.webp" alt="Rofaida wrapped in a scarf on a beach at night"></figure>
-        <figure class="ph" tabindex="0" data-n="eggs.jpg" style="left:calc(982.5 * var(--s));top:calc(544.4 * var(--s));width:calc(153.3 * var(--s));height:calc(181.2 * var(--s))"><img src="f/p-eggs.webp" alt="Two fried eggs with chilli flakes in a pan"></figure>
-        <figure class="ph" tabindex="0" data-n="sourdough.jpg" style="left:calc(1059.1 * var(--s));top:calc(445.8 * var(--s));width:calc(167.1 * var(--s));height:calc(166.8 * var(--s))"><img src="f/p-bread.webp" alt="A loaf of homemade sourdough on a cooling rack"></figure>
-        <figure class="ph" tabindex="0" data-n="matcha-desk.jpg" style="left:calc(550.8 * var(--s));top:calc(626.5 * var(--s));width:calc(233.4 * var(--s));height:calc(124.1 * var(--s))"><img src="f/p-laptop.webp" alt="A laptop on a video call next to an iced matcha"></figure>
-        <figure class="ph" tabindex="0" data-n="matcha-girl.png" style="left:calc(711.2 * var(--s));top:calc(552.9 * var(--s));width:calc(130 * var(--s));height:calc(142.9 * var(--s))"><img src="f/p-matcha.webp" alt="Cartoon of a girl in sunglasses sipping matcha"></figure>
-        <figure class="ph" tabindex="0" data-n="dream-desk.png" style="left:calc(175.4 * var(--s));top:calc(471.5 * var(--s));width:calc(249.5 * var(--s));height:calc(141.3 * var(--s))"><img src="f/p-desk.webp" alt="Illustration of a cosy desk with posters and a lamp"></figure>
-        <figure class="ph" tabindex="0" data-n="me-wall.jpg" style="left:calc(84.4 * var(--s));top:calc(534 * var(--s));width:calc(154.2 * var(--s));height:calc(191.5 * var(--s))"><img src="f/p-wall.webp" alt="Rofaida in front of a wall of anime posters"></figure>
-        <figure class="ph" tabindex="0" data-n="sushi.jpg" style="left:calc(274 * var(--s));top:calc(70.7 * var(--s));width:calc(138.3 * var(--s));height:calc(136.3 * var(--s))"><img src="f/p-sushi.webp" alt="A platter of sushi rolls and noodles"></figure>
-        <figure class="ph" tabindex="0" data-n="nile-sunset.jpg" style="left:calc(81.7 * var(--s));top:calc(138.8 * var(--s));width:calc(111.8 * var(--s));height:calc(149 * var(--s))"><img src="f/p-nile.webp" alt="Sunset over the Nile from under a parasol"></figure>
-        <figure class="ph" tabindex="0" data-n="sinai-7.jpg" style="left:calc(175.4 * var(--s));top:calc(173.3 * var(--s));width:calc(174.3 * var(--s));height:calc(124.3 * var(--s))"><img src="f/p-ship.webp" alt="The bridge of a ferry named Sinai 7"></figure>
-        <figure class="ph" tabindex="0" data-n="plane.png" style="left:calc(1081.9 * var(--s));top:calc(130.5 * var(--s));width:calc(191.6 * var(--s));height:calc(123.7 * var(--s))"><img src="f/p-plane.webp" alt="A white passenger plane"></figure>
-        <figure class="ph" tabindex="0" data-n="sketching.jpg" style="left:calc(663.5 * var(--s));top:calc(50.3 * var(--s));width:calc(165.1 * var(--s));height:calc(113.6 * var(--s))"><img src="f/p-sketch.webp" alt="A hand sketching a building in watercolour"></figure>
-        <figure class="ph" tabindex="0" data-n="iced-latte.jpg" style="left:calc(1135.8 * var(--s));top:calc(591.3 * var(--s));width:calc(83.3 * var(--s));height:calc(112 * var(--s))"><img src="f/p-latte.webp" alt="A glass of iced latte in the sun"></figure>
-        <figure class="ph" tabindex="0" data-n="survey-corps.png" style="left:calc(676.7 * var(--s));top:calc(146.3 * var(--s));width:calc(102.4 * var(--s));height:calc(102.3 * var(--s))"><img src="f/p-aot.webp" alt="Anime still of two characters in uniform"></figure>
-        <figure class="ph" tabindex="0" data-n="self-portrait.png" style="left:calc(553.9 * var(--s));top:calc(83.4 * var(--s));width:calc(130.5 * var(--s));height:calc(130.5 * var(--s))"><img src="f/p-avatar.webp" alt="Illustrated self-portrait of Rofaida in a red scarf"></figure>
-        <figure class="ph" tabindex="0" data-n="cat-at-work.jpg" style="left:calc(217.8 * var(--s));top:calc(594.6 * var(--s));width:calc(112.4 * var(--s));height:calc(111.6 * var(--s))"><img src="f/p-catlaptop.webp" alt="A cat yawning in front of a laptop"></figure>
-        <figure class="ph" tabindex="0" data-n="ceo-cat.png" style="left:calc(507.3 * var(--s));top:calc(563.4 * var(--s));width:calc(153.6 * var(--s));height:calc(141.2 * var(--s))"><img src="f/p-catsuit.webp" alt="A cat in a suit holding an iced coffee"></figure>
+        <figure class="ph" tabindex="0" data-n="salad-bowls.jpg" style="left:calc(104.2 * var(--s));top:calc(44 * var(--s));width:calc(178.6 * var(--s));height:calc(133.9 * var(--s))"><img data-src="f/p-bowls.webp" alt="Three wooden bowls of salad with green dressing"></figure>
+        <figure class="ph" tabindex="0" data-n="manama.jpg" style="left:calc(955.5 * var(--s));top:calc(59.7 * var(--s));width:calc(119 * var(--s));height:calc(158.7 * var(--s))"><img data-src="f/p-bahrain.webp" alt="Rofaida on a boat with a city skyline behind her"></figure>
+        <figure class="ph" tabindex="0" data-n="makkah.jpg" style="left:calc(1059.1 * var(--s));top:calc(83.4 * var(--s));width:calc(111.4 * var(--s));height:calc(128.3 * var(--s))"><img data-src="f/p-makkah.webp" alt="A street in Makkah at night"></figure>
+        <figure class="ph" tabindex="0" data-n="beach-night.jpg" style="left:calc(992.8 * var(--s));top:calc(206 * var(--s));width:calc(190 * var(--s));height:calc(122.7 * var(--s))"><img data-src="f/p-scarf.webp" alt="Rofaida wrapped in a scarf on a beach at night"></figure>
+        <figure class="ph" tabindex="0" data-n="eggs.jpg" style="left:calc(982.5 * var(--s));top:calc(544.4 * var(--s));width:calc(153.3 * var(--s));height:calc(181.2 * var(--s))"><img data-src="f/p-eggs.webp" alt="Two fried eggs with chilli flakes in a pan"></figure>
+        <figure class="ph" tabindex="0" data-n="sourdough.jpg" style="left:calc(1059.1 * var(--s));top:calc(445.8 * var(--s));width:calc(167.1 * var(--s));height:calc(166.8 * var(--s))"><img data-src="f/p-bread.webp" alt="A loaf of homemade sourdough on a cooling rack"></figure>
+        <figure class="ph" tabindex="0" data-n="matcha-desk.jpg" style="left:calc(550.8 * var(--s));top:calc(626.5 * var(--s));width:calc(233.4 * var(--s));height:calc(124.1 * var(--s))"><img data-src="f/p-laptop.webp" alt="A laptop on a video call next to an iced matcha"></figure>
+        <figure class="ph" tabindex="0" data-n="matcha-girl.png" style="left:calc(711.2 * var(--s));top:calc(552.9 * var(--s));width:calc(130 * var(--s));height:calc(142.9 * var(--s))"><img data-src="f/p-matcha.webp" alt="Cartoon of a girl in sunglasses sipping matcha"></figure>
+        <figure class="ph" tabindex="0" data-n="dream-desk.png" style="left:calc(175.4 * var(--s));top:calc(471.5 * var(--s));width:calc(249.5 * var(--s));height:calc(141.3 * var(--s))"><img data-src="f/p-desk.webp" alt="Illustration of a cosy desk with posters and a lamp"></figure>
+        <figure class="ph" tabindex="0" data-n="me-wall.jpg" style="left:calc(84.4 * var(--s));top:calc(534 * var(--s));width:calc(154.2 * var(--s));height:calc(191.5 * var(--s))"><img data-src="f/p-wall.webp" alt="Rofaida in front of a wall of anime posters"></figure>
+        <figure class="ph" tabindex="0" data-n="sushi.jpg" style="left:calc(274 * var(--s));top:calc(70.7 * var(--s));width:calc(138.3 * var(--s));height:calc(136.3 * var(--s))"><img data-src="f/p-sushi.webp" alt="A platter of sushi rolls and noodles"></figure>
+        <figure class="ph" tabindex="0" data-n="nile-sunset.jpg" style="left:calc(81.7 * var(--s));top:calc(138.8 * var(--s));width:calc(111.8 * var(--s));height:calc(149 * var(--s))"><img data-src="f/p-nile.webp" alt="Sunset over the Nile from under a parasol"></figure>
+        <figure class="ph" tabindex="0" data-n="sinai-7.jpg" style="left:calc(175.4 * var(--s));top:calc(173.3 * var(--s));width:calc(174.3 * var(--s));height:calc(124.3 * var(--s))"><img data-src="f/p-ship.webp" alt="The bridge of a ferry named Sinai 7"></figure>
+        <figure class="ph" tabindex="0" data-n="plane.png" style="left:calc(1081.9 * var(--s));top:calc(130.5 * var(--s));width:calc(191.6 * var(--s));height:calc(123.7 * var(--s))"><img data-src="f/p-plane.webp" alt="A white passenger plane"></figure>
+        <figure class="ph" tabindex="0" data-n="sketching.jpg" style="left:calc(663.5 * var(--s));top:calc(50.3 * var(--s));width:calc(165.1 * var(--s));height:calc(113.6 * var(--s))"><img data-src="f/p-sketch.webp" alt="A hand sketching a building in watercolour"></figure>
+        <figure class="ph" tabindex="0" data-n="iced-latte.jpg" style="left:calc(1135.8 * var(--s));top:calc(591.3 * var(--s));width:calc(83.3 * var(--s));height:calc(112 * var(--s))"><img data-src="f/p-latte.webp" alt="A glass of iced latte in the sun"></figure>
+        <figure class="ph" tabindex="0" data-n="survey-corps.png" style="left:calc(676.7 * var(--s));top:calc(146.3 * var(--s));width:calc(102.4 * var(--s));height:calc(102.3 * var(--s))"><img data-src="f/p-aot.webp" alt="Anime still of two characters in uniform"></figure>
+        <figure class="ph" tabindex="0" data-n="self-portrait.png" style="left:calc(553.9 * var(--s));top:calc(83.4 * var(--s));width:calc(130.5 * var(--s));height:calc(130.5 * var(--s))"><img data-src="f/p-avatar.webp" alt="Illustrated self-portrait of Rofaida in a red scarf"></figure>
+        <figure class="ph" tabindex="0" data-n="cat-at-work.jpg" style="left:calc(217.8 * var(--s));top:calc(594.6 * var(--s));width:calc(112.4 * var(--s));height:calc(111.6 * var(--s))"><img data-src="f/p-catlaptop.webp" alt="A cat yawning in front of a laptop"></figure>
+        <figure class="ph" tabindex="0" data-n="ceo-cat.png" style="left:calc(507.3 * var(--s));top:calc(563.4 * var(--s));width:calc(153.6 * var(--s));height:calc(141.2 * var(--s))"><img data-src="f/p-catsuit.webp" alt="A cat in a suit holding an iced coffee"></figure>
         <div class="sel" id="sel" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b id="selLabel"></b></div>
         <p class="px-hint">drag them around, or tap one to look closer</p>
       </div></div>
@@ -537,8 +538,8 @@
   <!-- ===================================================== let's talk (through the headphones) -->
   <div class="layer contact-page" id="contactPage" role="dialog" aria-modal="true" aria-labelledby="talkH" tabindex="-1">
     <section class="talk" id="contact">
-      <div class="talk-sky sky-drift" aria-hidden="true"><div class="skytrack"><img src="f/sky-talk.webp" alt="" loading="lazy"><img class="flip" src="f/sky-talk.webp" alt="" loading="lazy"></div></div>
-      <div class="talk-hill" aria-hidden="true"><img src="f/hill.webp" alt="" loading="lazy"></div>
+      <div class="talk-sky sky-drift" aria-hidden="true"><div class="skytrack"><img data-src="f/sky-talk.webp" data-srcset="f/sky-talk-m.webp 1159w, f/sky-talk.webp 1932w" sizes="(max-width: 760px) 385px, (pointer: coarse) 385px, 101vw" alt="" loading="lazy"><img class="flip" data-src="f/sky-talk.webp" data-srcset="f/sky-talk-m.webp 1159w, f/sky-talk.webp 1932w" sizes="(max-width: 760px) 385px, (pointer: coarse) 385px, 101vw" alt="" loading="lazy"></div></div>
+      <div class="talk-hill" aria-hidden="true"><img data-src="f/hill.webp" data-srcset="f/hill-m.webp 1158w, f/hill.webp 1930w" sizes="(max-width: 760px) 385px, (pointer: coarse) 385px, 100vw" alt="" loading="lazy"></div>
       <div class="frame">
         <div class="glass" id="glass">
           <h2 class="talk-h" id="talkH">Let's talk</h2>
@@ -552,12 +553,12 @@
           <p class="talk-mail"><span>rofaidaabdalwahap@gmail.com</span></p>
           <p class="talk-status"><i></i>Available for new work &middot; Cairo, <span id="cairoTime">--:--</span></p>
         </div>
-        <div class="cloud c1" aria-hidden="true"><img src="f/cloud-a.webp" alt="" loading="lazy"></div>
-        <div class="cloud c2" aria-hidden="true"><img src="f/cloud-a.webp" alt="" loading="lazy"></div>
-        <div class="cloud c3" aria-hidden="true"><img src="f/cloud-b.webp" alt="" loading="lazy"></div>
+        <div class="cloud c1" aria-hidden="true"><img data-src="f/cloud-a.webp" alt="" loading="lazy"></div>
+        <div class="cloud c2" aria-hidden="true"><img data-src="f/cloud-a.webp" alt="" loading="lazy"></div>
+        <div class="cloud c3" aria-hidden="true"><img data-src="f/cloud-b.webp" alt="" loading="lazy"></div>
         <div class="sky-glass talk-glass"><p>Sky has no limits.</p></div>
         <p class="talk-foot">&copy; 2026 Rofaida Abdelwahap &middot; Illustrations drawn by Rofaida &middot; Made in Cairo</p>
-        <button class="talk-me" id="talkMe" type="button" aria-label="Say hi to Rofaida"><span class="ring" aria-hidden="true"></span><span class="ring r2" aria-hidden="true"></span><span class="avface"><img src="f/avatar.webp" alt="Illustrated portrait of Rofaida in a red scarf and green jacket" loading="lazy"></span><span class="online" aria-hidden="true"></span></button>
+        <button class="talk-me" id="talkMe" type="button" aria-label="Say hi to Rofaida"><span class="ring" aria-hidden="true"></span><span class="ring r2" aria-hidden="true"></span><span class="avface"><img data-src="f/avatar.webp" alt="Illustrated portrait of Rofaida in a red scarf and green jacket" loading="lazy"></span><span class="online" aria-hidden="true"></span></button>
       </div>
     </section>
     <button class="glass-btn close c-close" id="contactClose" type="button" aria-label="Close and go back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>

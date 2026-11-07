@@ -678,7 +678,8 @@
   function fadeTo(v, ms, done) {
     cancelAnimationFrame(fade); var v0 = au.volume, t0 = performance.now();
     (function step(now) {
-      var k = Math.min(1, (now - t0) / ms); au.volume = v0 + (v - v0) * k;
+      /* the first frame's timestamp can be a hair before t0: clamp, or a negative volume throws and the music stays silent */
+      var k = Math.max(0, Math.min(1, (now - t0) / ms)); au.volume = Math.max(0, Math.min(1, v0 + (v - v0) * k));
       if (k < 1) fade = requestAnimationFrame(step); else if (done) done();
     })(t0);
   }

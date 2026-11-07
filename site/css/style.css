@@ -391,7 +391,12 @@ button{font:inherit;color:inherit}
 .cup-shadow{pointer-events:none;mix-blend-mode:multiply;opacity:.5}
 .cup-grass{pointer-events:none}
 .page-ink{position:absolute;left:0;top:0;width:720px;height:920px;transform-origin:0 0;pointer-events:none !important}
-.page-ink.l{mix-blend-mode:multiply;color:#2E4A12}
+.page-ink.l{color:#2E4A12}
+/* Nov 7: text that isn't transformed went missing on the notebook in some browsers (the rotated "Always asking"
+   and the polaroid captions still drew): no blend mode on the 3D-mapped sheet, and every text block paints
+   through its own tiny transform, the same way the text that did show */
+.page-ink{backface-visibility:hidden}
+.page-ink .ink-t,.page-ink .ink-p,.page-ink .ink-cta{transform:rotate(.01deg);transform-origin:0 0}
 .page-ink.l.stk{mix-blend-mode:normal}
 /* "Who is Rofaida ?" — Doha's page (Oct 24): ruled lines, a margin rule, cats in the corners */
 .page-ink.l:not(.stk){background:

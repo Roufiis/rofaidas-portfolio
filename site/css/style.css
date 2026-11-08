@@ -2445,5 +2445,9 @@ html:not(.editing) .ed-hidden{display:none !important}
 .j-pola:has(img[src$="p-matcha.webp"]) figcaption{padding-left:calc(52 * var(--j))}
 
 /* Nov 9 (Doha): the site's own arrow everywhere, links and buttons included; drag, text and zoom cursors keep their own shape */
-:root{--cur:url(../i/arrow-s.svg) 3 3, url(../i/arrow-s.png) 3 3, auto}
+:root{--cur:url(../i/arrow-v.svg) 3 3, url(../i/arrow-s.png) 3 3, auto}
 html,body,body *:not(input):not(textarea):not(select):not([contenteditable="true"]){cursor:var(--cur)}
+/* Nov 9 (Firefox): pressing or dragging on the keyring selected its pictures, and Firefox paints selected
+   pictures with a pale blue box. Nothing in the keyring (or the other draggable/turnable art) can be selected now. */
+.kc-hero,.kc-hero *,.peek,.peek *,.folder,.folder *,.awr-strip,.awr-strip *{user-select:none;-webkit-user-select:none;-moz-user-select:none}
+.kc-hero img,.peek img,.folder img,.awr-strip img,.world img{-webkit-user-drag:none}

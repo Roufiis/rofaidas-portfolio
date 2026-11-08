@@ -4424,6 +4424,7 @@ window.__kcBoot = function () {
     unlockAudio();
   }
   addEventListener("pointermove", onMove, { passive: true });
+  hero.addEventListener("dragstart", function (e) { e.preventDefault(); });   /* Firefox: no ghost-drag of the charm pictures */
   addEventListener("pointerdown", function (e) {
     unlockAudio();
     if (e.pointerType === "touch") { var p = toLocal(e.clientX, e.clientY); setOpen(overKeychain(p[0], p[1])); }

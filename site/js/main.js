@@ -3465,7 +3465,7 @@
   P.push({ cls: "ruled", html:
     wash(100, 120, 620, 520, "rgba(231,169,160,.45)") +
     hand("to be continued&hellip;", 80, 150, -3, 58) +
-    note("The next page is still blank. I&rsquo;m open to product design roles and selected freelance work, where a <b>visual eye</b> and <b>product thinking</b> meet.", 80, 300, 600, -1) +
+    note("The next page is still blank, and that&rsquo;s on purpose: there are <b>so many things</b> I still want to achieve, and I&rsquo;m saving room for <b>every one of them</b>.", 80, 300, 600, -1) +
     cta("Let&rsquo;s talk &rarr;", 90, 540, -2, 'href="#contact" data-jgo="contact"') +
     cta("My resume &#8599;", 390, 540, 2, 'href="' + DRIVE + '" target="_blank" rel="noopener"') +
     kst("olive", "Sticker: an olive branch", 60, 700, 170, -6) + kst("watermelon", "Sticker: a slice of watermelon", 280, 740, 190, 6) +

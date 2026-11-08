@@ -30,6 +30,20 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages project create rofaidaabdelwahap --production-branch=main
+      # make sure `main` is the live (production) branch, so every deploy goes to rofaidaabdelwahap.pages.dev itself, not a preview
+      - name: Make main the production branch
+        continue-on-error: true
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          API="https://api.cloudflare.com/client/v4/accounts/$ACCOUNT/pages/projects/rofaidaabdelwahap"
+          BR=$(curl -s -H "Authorization: Bearer $TOKEN" "$API" | jq -r '.result.production_branch // "?"')
+          SUB=$(curl -s -H "Authorization: Bearer $TOKEN" "$API" | jq -r '.result.subdomain // "?"')
+          echo "::notice title=before::production_branch=$BR subdomain=$SUB"
+          if [ "$BR" != "main" ]; then
+            curl -s -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" --data '{"production_branch":"main"}' "$API" | jq -c '{success, errors, branch: .result.production_branch}'
+          fi
       - name: Deploy the site
         uses: cloudflare/wrangler-action@v3
         with:
@@ -44,3 +58,14 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy redirect --project-name=rofaidas-portfolio --branch=main --commit-dirty=true
+      # report what is live, so it shows on the run page
+      - name: Report the live deployment
+        if: always()
+        continue-on-error: true
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          API="https://api.cloudflare.com/client/v4/accounts/$ACCOUNT/pages/projects/rofaidaabdelwahap"
+          P=$(curl -s -H "Authorization: Bearer $TOKEN" "$API")
+          echo "::notice title=project::$(echo "$P" | jq -c '{sub: .result.subdomain, prod: .result.production_branch, domains: .result.domains, latest: {env: .result.latest_deployment.environment, branch: .result.latest_deployment.deployment_trigger.metadata.branch, url: .result.latest_deployment.url}, live: {branch: .result.canonical_deployment.deployment_trigger.metadata.branch, created: .result.canonical_deployment.created_on, url: .result.canonical_deployment.url}}')"

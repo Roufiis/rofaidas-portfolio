@@ -3441,7 +3441,7 @@
   ];
   P.push({ cls: "grid", html:
     type("my learning journey", 56, 50, -2) +
-    note("I like trying every kind of design: <b>UI/UX</b> (2 courses), <b>3D</b>, <b>calligraphy</b> and <b>graphic design</b>. Newest first:", 60, 128, 530, -1) +
+    note("I never stop learning. Every new craft teaches me to <b>see a little differently</b>, and that fresh eye ends up in <b>every design</b>.", 60, 128, 530, -1) +
     sheet('<ol class="jl-line">' + LEARN.map(function (l) {
       return '<li><b class="yr">' + l[0] + '</b><div><span class="jl-tag ' + l[2] + '">' + l[1] + '</span><p class="role">' + l[3] + '</p><p class="where">' + l[4] + '</p><p class="what">' + l[5] + "</p></div></li>"; }).join("") + "</ol>",
       40, 262, 580, -1, "binder", 1, "tight jl-sheet") +

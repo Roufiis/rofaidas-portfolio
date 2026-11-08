@@ -2445,5 +2445,5 @@ html:not(.editing) .ed-hidden{display:none !important}
 .j-pola:has(img[src$="p-matcha.webp"]) figcaption{padding-left:calc(52 * var(--j))}
 
 /* Nov 9 (Doha): the site's own arrow everywhere, links and buttons included; drag, text and zoom cursors keep their own shape */
-:root{--cur:url(../i/arrow.svg) 3 3, url(../i/arrow.png) 3 3, auto}
+:root{--cur:url(../i/arrow-s.svg) 3 3, url(../i/arrow-s.png) 3 3, auto}
 html,body,body *:not(input):not(textarea):not(select):not([contenteditable="true"]){cursor:var(--cur)}

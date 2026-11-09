@@ -1942,8 +1942,9 @@ a.awr-btn{text-decoration:none}
 /* phones held upright: the hill is zoomed out so the cat, her, the headphones, the notebook and the laptop all fit;
    the painting sits on the bottom of the screen and its sky fades into the page sky above it */
 @media (max-width:760px) and (orientation:portrait){
-  .f-home .art{--W:max(100vw, calc(100vw / .41));--H:calc(var(--W) * var(--arh) / var(--arw));
-    left:calc((100vw - var(--W)) * .9);top:calc(var(--vh) - var(--H))}   /* no mask here: the plate's own fade melts its top, and a mask on a layer that zooms is costly */
+  .f-home .art{--W:max(100vw, calc(100vw * 1921 / 930));--H:calc(var(--W) * var(--arh) / var(--arw));
+    left:calc(50vw - 1448 * var(--k));top:calc(var(--vh) - var(--H))}   /* Nov 9: framed from the cat to the laptop, both whole */
+  .home-ui{top:88px}   /* Nov 9: the hello pill, title and player sit closer under the header */   /* no mask here: the plate's own fade melts its top, and a mask on a layer that zooms is costly */
 }
 /* the same zoomed-out framing on the Selected works painting (upright phones only); About keeps its full-bleed framing */
 @media (max-width:760px) and (orientation:portrait){

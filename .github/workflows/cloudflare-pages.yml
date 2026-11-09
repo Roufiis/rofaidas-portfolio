@@ -1,10 +1,10 @@
-name: Deploy to Cloudflare Pages
+name: Preview deploy (mobile-preview branch, not the live site)
 on:
   push:
-    branches: [main]
+    branches: [mobile-preview]
   workflow_dispatch:
 concurrency:
-  group: cloudflare-pages
+  group: cloudflare-pages-preview
   cancel-in-progress: true
 jobs:
   deploy:
@@ -22,50 +22,9 @@ jobs:
             echo "::error::Add the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets (see README)."
             exit 1
           fi
-      # the site lives at rofaidaabdelwahap.pages.dev (the project is created on the first run)
-      - name: Create the Pages project if it doesn't exist yet
-        uses: cloudflare/wrangler-action@v3
-        continue-on-error: true
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages project create rofaidaabdelwahap --production-branch=main
-      # make sure `main` is the live (production) branch, so every deploy goes to rofaidaabdelwahap.pages.dev itself, not a preview
-      - name: Make main the production branch
-        continue-on-error: true
-        env:
-          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          API="https://api.cloudflare.com/client/v4/accounts/$ACCOUNT/pages/projects/rofaidaabdelwahap"
-          BR=$(curl -s -H "Authorization: Bearer $TOKEN" "$API" | jq -r '.result.production_branch // "?"')
-          SUB=$(curl -s -H "Authorization: Bearer $TOKEN" "$API" | jq -r '.result.subdomain // "?"')
-          echo "::notice title=before::production_branch=$BR subdomain=$SUB"
-          if [ "$BR" != "main" ]; then
-            curl -s -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" --data '{"production_branch":"main"}' "$API" | jq -c '{success, errors, branch: .result.production_branch}'
-          fi
       - name: Deploy the site
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site --project-name=rofaidaabdelwahap --branch=main --commit-dirty=true
-      # the old address keeps working: every page there sends visitors to the new one
-      - name: Point the old address to the new one
-        uses: cloudflare/wrangler-action@v3
-        continue-on-error: true
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy redirect --project-name=rofaidas-portfolio --branch=main --commit-dirty=true
-      # report what is live, so it shows on the run page
-      - name: Report the live deployment
-        if: always()
-        continue-on-error: true
-        env:
-          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          API="https://api.cloudflare.com/client/v4/accounts/$ACCOUNT/pages/projects/rofaidaabdelwahap"
-          P=$(curl -s -H "Authorization: Bearer $TOKEN" "$API")
-          echo "::notice title=project::$(echo "$P" | jq -c '{sub: .result.subdomain, prod: .result.production_branch, domains: .result.domains, latest: {env: .result.latest_deployment.environment, branch: .result.latest_deployment.deployment_trigger.metadata.branch, url: .result.latest_deployment.url}, live: {branch: .result.canonical_deployment.deployment_trigger.metadata.branch, created: .result.canonical_deployment.created_on, url: .result.canonical_deployment.url}}')"
+          command: pages deploy site --project-name=rofaidaabdelwahap --branch=mobile-preview --commit-dirty=true

@@ -2451,3 +2451,9 @@ html,body,body *:not(input):not(textarea):not(select):not([contenteditable="true
    pictures with a pale blue box. Nothing in the keyring (or the other draggable/turnable art) can be selected now. */
 .kc-hero,.kc-hero *,.peek,.peek *,.folder,.folder *,.awr-strip,.awr-strip *{user-select:none;-webkit-user-select:none;-moz-user-select:none}
 .kc-hero img,.peek img,.folder img,.awr-strip img,.world img{-webkit-user-drag:none}
+/* PREVIEW (Nov 9): upright phones frame the hill like the "A painting that listens" tile:
+   her, the headphones, the laptop and the notebook fill the width; the title sits in the sky above her */
+@media (max-width:760px) and (orientation:portrait){
+  .f-home .art{--W:max(calc(100vw * 1.6), min(calc(100vw * 1921 / 650), calc((var(--vh) - 470px) * 3.577)));--H:calc(var(--W) * var(--arh) / var(--arw));
+    left:calc(50vw - 1607 * var(--k));top:calc(var(--vh) - var(--H))}   /* centred on her; short screens zoom out so her face stays below the title and player */
+}

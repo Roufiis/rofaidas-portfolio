@@ -1949,7 +1949,7 @@ a.awr-btn{text-decoration:none}
 /* the same zoomed-out framing on the Selected works painting (upright phones only); About keeps its full-bleed framing */
 @media (max-width:760px) and (orientation:portrait){
   .f-works .art{--W:max(100vw, calc(100vw / .41));--H:calc(var(--W) * var(--arh) / var(--arw));
-    left:calc((100vw - var(--W)) * .77);top:calc(var(--vh) - var(--H));
+    left:calc(50vw - 1190 * var(--k));top:calc(var(--vh) - var(--H));   /* Nov 9: the laptop (deck to screen edge) centred on the screen */
     -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14%);mask-image:linear-gradient(to bottom,transparent 0,#000 14%)}
 }
 

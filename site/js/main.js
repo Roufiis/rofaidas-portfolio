@@ -765,6 +765,7 @@
   setFace(0, false);
   R.setMode("world");
   var hash = (location.hash || "").slice(1);
+  if (/^all(-|$)/.test(hash)) hash = "works";   /* #all-ui etc. open All works, which sits on the works room */
   if (hash === "works" || hash === "about") { var i = hash === "works" ? 1 : 2; ang.x = ang.t = -i * 120; paint(); setFace(i, false); }
   window.__R2 = { state: function () { return { ang: ang.x, dep: dep.x, face: face, phase: phase }; } };
 })();
@@ -988,7 +989,7 @@
   /* skip the opening shot: deep links, reduced motion */
   var hash = (location.hash || "").slice(1);
   measure();
-  if (R.reduced || hash === "works" || hash === "about") { t = tt = 1; render(1); }
+  if (R.reduced || hash === "works" || hash === "about" || /^all(-|$)/.test(hash)) { t = tt = 1; render(1); }
   else render(0);
   addEventListener("resize", function () { measure(); });
   addEventListener("load", function () { measure(); });
@@ -1230,6 +1231,12 @@
     R.setMode("works");
   };
   seeTab.addEventListener("click", function () { openAll(seeTab); });
+  /* Nov 9: links such as #all-ui land straight on All works with that filter on (the Snapchat page's back link uses it) */
+  (function () {
+    var m = /^#all(?:-([a-z]+))?$/.exec(location.hash || ""); if (!m) return;
+    all.classList.add("open"); all.scrollTop = 0; R.setMode("all"); allFrom = seeTab;
+    if (m[1]) setTimeout(function () { var f = document.querySelector('.awg-filter button[data-g="' + m[1] + '"]'); if (f) f.click(); }, 0);
+  })();
   $$("[data-allworks]").forEach(function (b) { b.addEventListener("click", function () { openAll(b); }); });
   $("#awClose").addEventListener("click", function () { R.closeAll(); });
   /* the list: one row open at a time (hover on a mouse, tap anywhere), and

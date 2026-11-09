@@ -1350,7 +1350,7 @@
       li.innerHTML = '<div class="awr-row"><span class="awr-n">' + ("00" + (i + 1)).slice(-3) + '</span><h3 class="awr-name"><button class="awr-toggle" type="button" aria-expanded="false" aria-controls="awr-' + id + '">' + esc2(name) + '</button><span class="awr-kind">' + esc2(REEL_LBL[id] || KIND_LBL[k]) + "</span></h3>" +
         '<p class="awr-desc">' + esc2(desc) + '</p>' + ((info.link || k === "graphic") && info.behance
           /* graphics open the project on Behance, in a new tab */
-          ? '<a class="awr-btn" href="' + info.behance + '" target="_blank" rel="noopener">View project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg><span class="sr"> (opens in a new tab)</span></a>'
+          ? '<a class="awr-btn" href="' + info.behance + '"' + (info.link ? '' : ' target="_blank" rel="noopener"') + '>View project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg>' + (info.link ? '' : '<span class="sr"> (opens in a new tab)</span>') + '</a>'
           : '<button class="awr-btn" type="button" data-case="' + id + '">View project <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#arrUR"/></svg></button>') + '</div>' +
         '<div class="awr-more" id="awr-' + id + '"><div class="awr-more-in"><div class="awr-strip" aria-hidden="true"><div class="awr-track"><div class="awr-set">' + set + '</div><div class="awr-set dup">' + set + "</div></div></div></div></div>";
       if (id === "nexa") {
@@ -2482,7 +2482,7 @@
     var a = e.target.closest("[data-case]"); if (!a || !byId[a.getAttribute("data-case")]) return;
     e.preventDefault(); e.stopPropagation();
     var lk = byId[a.getAttribute("data-case")].link;   /* a project with its own page (Snapchat Spellbook) opens it in a new tab */
-    if (lk) { window.open(lk, "_blank", "noopener"); return; }
+    if (lk) { location.href = lk; return; }   /* same tab: iPhones set to open links in the background showed nothing happening */
     open(a.getAttribute("data-case"), a);
   }, true);
   addEventListener("keydown", function (e) { if (e.key === "Escape" && site.getAttribute("data-mode") === "case") { close(); e.preventDefault(); } });

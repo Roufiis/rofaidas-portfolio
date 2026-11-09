@@ -5331,6 +5331,8 @@ window.__kcBoot = function () {
   function soon() { if (!q) q = requestAnimationFrame(function () { q = 0; check(); }); }
   var mo = new MutationObserver(soon), opts = { attributes: true, attributeFilter: ["data-mode", "data-face", "data-dive", "data-sheet", "data-compass", "aria-hidden", "class", "hidden"] };
   ["site", "journal", "compass", "allWorks", "sheets"].forEach(function (id) { var el = $(id); if (el) mo.observe(el, opts); });
+  /* pictures added later inside an open part (the All works reel is built after a #all-ui link opens it) wake too */
+  var aw0 = $("allWorks"); if (aw0) new MutationObserver(soon).observe(aw0, { childList: true, subtree: true });
   /* a row of All works starts loading its strip as soon as the pointer reaches it */
   var aw = $("allWorks");
   if (aw) aw.addEventListener("pointerover", function (e) { var it = e.target.closest && e.target.closest(".awr-item"); if (it) it.querySelectorAll("img[loading=lazy]").forEach(function (im) { im.loading = "eager"; }); }, { passive: true });

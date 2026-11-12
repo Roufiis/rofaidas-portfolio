@@ -3233,7 +3233,7 @@
   var stage = $(".j-stage", root), slotL = $(".j-slot.l", root), slotR = $(".j-slot.r", root), leaf = $(".j-leaf", root);
   var faceF = $(".j-face.front", leaf), faceB = $(".j-face.back", leaf), underL = $(".j-under.l", root), underR = $(".j-under.r", root);
   var hintEl = $(".j-hint", root), countEl = $(".j-count", root), prevBtn = $(".j-prev", root), nextBtn = $(".j-next", root);
-  var DRIVE = "https://drive.google.com/file/d/1btNfa-B7rLPgWYI5pzXkS12cbSmnBby5/view?usp=sharing";
+  var DRIVE = "Rofaida-AbdElWahap_Product-Designer_Resume.pdf";
 
   /* ------------------------------------------------------------ helpers */
   function J(n) { return "calc(" + n + " * var(--j))"; }
@@ -5345,4 +5345,11 @@ window.__kcBoot = function () {
       setTimeout(function () { idle(function () { wake($("worksPage")); }); }, 6000);
     });
   }
+})();
+
+/* Nov 12: on touch screens the resume opens in the same tab (iPhones set to open links in the background showed nothing happening) */
+(function () {
+  if (!matchMedia("(hover: none)").matches) return;
+  function fix(root) { (root || document).querySelectorAll('a[href$=".pdf"][target]').forEach(function (a) { a.removeAttribute("target"); }); }
+  fix(); new MutationObserver(function () { fix(); }).observe(document.body, { childList: true, subtree: true });
 })();
